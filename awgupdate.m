@@ -4,6 +4,9 @@ function awgupdate(groups)
 % Change nrep or jump of previously loaded groups 
 % Nothing done if fields don't exist.
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 global plsdata;
 global awgdata;
 

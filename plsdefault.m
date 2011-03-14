@@ -2,6 +2,9 @@ function pulse = plsdefault(pulse)
 % pulse = plsdefault(pulse)
 % set defaults and guess format if not given
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 global plsdata;
 if ~isstruct(pulse) % database indices given
     pulse = plsdata.pulses(pulse);        

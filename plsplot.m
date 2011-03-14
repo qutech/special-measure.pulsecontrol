@@ -1,6 +1,9 @@
 function plsplot(pulse, dict, ctrl)
 % plsplot(pulse, dict, ctrl)
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 if ~exist('ctrl','var')
     ctrl = '';
 end

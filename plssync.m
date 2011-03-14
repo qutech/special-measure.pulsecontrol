@@ -1,6 +1,9 @@
 function plssync(ctrl)
 % plssync(ctrl)
 % ctrl: load, save
+
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
 global plsdata;
 
 switch ctrl  

@@ -2,6 +2,9 @@ function zerolen = awgzero(grp, ind, zerolen)
 % zerolen = awgzero(grp, ind, zerolen)
 % determine if pulse is zero (helper function)
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 %global plsdata;
 global awgdata;
 

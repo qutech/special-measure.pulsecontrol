@@ -2,6 +2,9 @@ function zerolen = awgload(grp, ind, zerolen)
 % zerolen = awgload(grp)
 % load pulses from group to AWG. 
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 %global plsdata;
 global awgdata;
 

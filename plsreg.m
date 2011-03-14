@@ -6,6 +6,9 @@ function plsnum = plsreg(pulse, plsnum)
 % The return value plsnum is the pulse index for the pulse.
 % plsnum defaults to adding to the end.
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 global plsdata;
 
 pulse = plsdefault(pulse);

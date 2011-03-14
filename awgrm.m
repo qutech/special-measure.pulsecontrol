@@ -5,6 +5,9 @@ function awgrm(grp, ctrl)
 % (otherwise, specified group is removed by removing it and following ones
 % and then reloading the latter.
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 global awgdata;
 
 

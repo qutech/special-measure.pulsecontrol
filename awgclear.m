@@ -4,6 +4,9 @@ function awgclear(groups)
 % awgclear('all')
 % awgclear('pack') removes all groups, adds back groups loaded in sequences
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 global awgdata;
 global plsdata;
 

@@ -41,6 +41,9 @@ function pulse = plstotab(pulse)
 % adprep: adiabatic ramp along second diagonal (epsilon) from val(1) to val(2), ramp duration time.
 % adread: same, going the other way.
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 
 pulse = plsdefault(pulse);
 

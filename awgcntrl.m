@@ -5,6 +5,9 @@ function  val = awgcntrl(cntrl, chans)
 % isamp and isexton return a vector of length chans specifying which are
 % amp or in exton mode
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 global awgdata;
 
 if nargin <2

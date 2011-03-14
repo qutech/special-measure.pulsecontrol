@@ -6,6 +6,9 @@ function val = plsinfo(ctrl, group, ind, time)
 % stale: Return 1 if the group needs uploading.  Also prints a message.
 % gd: return the groupdef.  Does not honor time.
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 global plsdata;
 global awgdata;
 
@@ -47,13 +50,17 @@ switch ctrl
                         group);                    
                     le=le+1;
                 end
-                val = plslog(le).xval(ind, :);
+                if isempty(ind)
+                  val = plslog(le).xval(:, :);
+                else
+                  val = plslog(le).xval(ind, :);
+                end
             end
         end
    case 'params'        
         load([plsdata.grpdir, 'pg_', group], 'plslog','grpdef');
         le=logentry(plslog,time);
-        if nargin < 3
+        if nargin < 3 || isempty(ind)
             ind = 1;
         end
 
@@ -68,7 +75,12 @@ switch ctrl
               val = val(:,ind);              
             end
         else
-           val = plslog(le).params(:,ind);
+          while(max(ind) > size(plslog(le).params,1))
+              fprintf('Warning; not enough params on group %s.  Trying next log entry\n', ...
+                   group);                    
+              le=le+1;
+          end
+          val = plslog(le).params(ind,:);
         end
         
     case 'ro'
@@ -81,7 +93,7 @@ switch ctrl
                 val=val(i,:);
             end            
         else            
-            pd = plsmakegrp(group);
+            pd = plsmakegrp(group,'',1); % minor bug; assume all pulses have same readout.
             val = pd.pulses(1).data.readout;            
         end
     case 'zl'

@@ -5,6 +5,9 @@ function rinds = plslist(rng, name)
 % name: show only pulses with this name.
 % inds: indices of pulses displayed
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 global plsdata
 
 

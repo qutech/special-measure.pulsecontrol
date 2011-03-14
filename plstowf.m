@@ -18,6 +18,9 @@ function pulse = plstowf(pulse, dict)
 % taurc (optional)
 % xval
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 global plsdata;
 pulse = plsdefault(pulse);
 

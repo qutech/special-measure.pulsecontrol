@@ -43,6 +43,9 @@ function plsdefgrp(grpdef)
 %       trafofn (optional): transforms given parameters into pulse parameters. (Can be a function or matrix.)
 %
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 if length(grpdef) > 1
     for l=1:length(grpdef)
         plsdefgrp(grpdef(l));

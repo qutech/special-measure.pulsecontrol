@@ -2,6 +2,9 @@ function awgnpulse(groups, npulse)
 % awgnpulse(groups, npulse)
 % Set npulse for pulsegroups.
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 global awgdata;
 groups = awggrpind(groups);
     

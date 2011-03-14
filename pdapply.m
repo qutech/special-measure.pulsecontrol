@@ -2,6 +2,9 @@ function [pulse changed]=pdapply(pd,pulse)
 %function [pulse changed]=pdapply(pd, pulse)
 % Apply a pulse dictionary to a pulse.  Return the new pulse.  Changed is
 % true if the application was non-trivial
+
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
 if ~strcmp(pulse.format,'elem')
     changed=0;
     return;

@@ -6,6 +6,9 @@ function awgadd(groups)
 % row corresponds to a groups, each column to a varpar in this group.
 % ie, pulseind = [ 1 1 1 1 ; 1 2 3 4] will use pls 1 from group 1, pulse
 % 1-4 on group 2.
+
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
 global plsdata;
 global awgdata;
 awgcntrl('clr');

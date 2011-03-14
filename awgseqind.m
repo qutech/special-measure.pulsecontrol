@@ -3,6 +3,9 @@ function seqind = awgseqind(pulses,rep)
 % Find the pulse line associated with a pulse group or pulse index.
 % negative for groups, positive for pulse index.
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 global awgdata;
 if isstruct(pulses)
     rep=[pulses.rep];

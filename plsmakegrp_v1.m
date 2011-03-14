@@ -7,6 +7,9 @@ function grpdef = plsmakegrp(name, ctrl, ind)
 %       These may mess with the upload logging, so use with care.
 % ind: optional pulse index
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 global plsdata;
 global awgdata;
 

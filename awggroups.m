@@ -1,5 +1,8 @@
 function awggroups(ind)
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 global awgdata;
 
 if nargin < 1

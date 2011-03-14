@@ -4,6 +4,9 @@ function pd=pdsave(dict, val)
 % documentation purposes.  The pulse dictionary with the time field added
 % is returned.
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 global plsdata;
 
 fn=[plsdata.grpdir, 'pd_', dict,'.mat'];

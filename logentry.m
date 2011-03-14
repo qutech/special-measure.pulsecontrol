@@ -3,6 +3,9 @@ function logentry(index, varargin)
 % write entry str to logfile, starting with date if changed and time.
 % if the "index" is not given, it writes to the general file (index = 1)
 
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
+
 global loginfo;
 
 if isempty(loginfo) 

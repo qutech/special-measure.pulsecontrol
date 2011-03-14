@@ -1,4 +1,7 @@
 function plslint(pg)   % Try to find errors in pulse group before they happen
+
+% (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
+
 err=0;
 % Global checks.
 if isempty(pg)
