@@ -11,6 +11,7 @@ function awgadd(groups)
 
 global plsdata;
 global awgdata;
+astart=toc;
 awgcntrl('clr');
 awgcntrl('stop');
 
@@ -21,14 +22,18 @@ end
 dosave = false; % keeps track of whether awgdata changed.
 
 for k = 1:length(groups)
+    gstart=toc;
     load([plsdata.grpdir, 'pg_', groups{k}]);
 
     while plsinfo('stale',groups{k})
         fprintf('Latest pulses of group %s not loaded; %s > %s.\n', groups{k}, ...
             datestr(lastupdate), datestr(plslog(end).time(end)));
-        
+        tstart=toc;
         plsmakegrp(groups{k},'upload');
-        load([plsdata.grpdir, 'pg_', groups{k}]);
+        ts2 = toc;
+        awgcntrl('wait');
+        fprintf('Load time=%f secs, wait time=%f\n',toc-tstart,toc-ts2);
+        load([plsdata.grpdir, 'pg_', groups{k}]);        
     end
 
         
@@ -155,7 +160,9 @@ for k = 1:length(groups)
             fprintf('%i/%i pulses added.\n', i, npls);
         end
     end
+    fprintf('Group load time: %g secs\n',toc-gstart);
 
+    jstart=toc;
     % event jumps
     %SEQ:ELEM%d:JTARget:IND
     %SEQ:ELEM%d:JTARget:TYPE
@@ -174,7 +181,10 @@ for k = 1:length(groups)
     seqlog(end).jump = grpdef.jump;
 
     save([plsdata.grpdir, 'pg_', groups{k}], '-append', 'seqlog');
+    fprintf('Jump program time: %f secs\n',toc-jstart);
+    wstart=toc;
     awgcntrl('wait');
+    fprintf('Wait time: %f secs; total time %f secs\n',toc-wstart,toc-astart);
     fprintf('Added group %s on index %i. %s', grpdef.name, gind, query(awgdata.awg, 'SYST:ERR?'));
     logentry('Added group %s on index %i.', grpdef.name, gind);
 end
