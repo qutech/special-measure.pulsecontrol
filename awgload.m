@@ -12,6 +12,7 @@ global awgdata;
 %nchan = size(grp.pulses(1).data, 1); % assumed same for all.
 
 awgcntrl('stop'); %changing pulses while running is slow.
+awgsyncwaveforms(); % make sure the waveform list is up-to-date.
 dosave = false;
 % create trig pulse (and corresponding 0) if waveform list empty.
 if query(awgdata.awg, 'WLIS:SIZE?', '%s\n', '%i') == 25 % nothing loaded (except predefined)
@@ -55,14 +56,18 @@ for i = 1:length(grp.pulses)
             %if len ~= npts
             %    fprintf(awgdata.awg, sprintf('WLIS:WAV:DEL "%s"', name)); % remove waveform to allow size changes
             %    fprintf('Pulse length changed. Reload group %s.', grp.name)
-            %end
-             
-            fprintf(awgdata.awg, sprintf('WLIS:WAV:NEW "%s",%d,INT', name, npts));
-            err = query(awgdata.awg, 'SYST:ERR?');
-            if ~isempty(strfind(err,'E11113'))
-               fprintf(err(1:end-1));
-               error('Error loading waveform; AWG is out of memory.  Try awgclear(''all''); ');
+            %end                         
+            
+            if isempty(strmatch(name,awgdata.waveforms))                
+              fprintf(awgdata.awg, sprintf('WLIS:WAV:NEW "%s",%d,INT', name, npts));
+              err = query(awgdata.awg, 'SYST:ERR?');
+              if ~isempty(strfind(err,'E11113'))
+                 fprintf(err(1:end-1));
+                 error('Error loading waveform; AWG is out of memory.  Try awgclear(''all''); ');
+              end
+              awgdata.waveforms{end+1}=name;            
             end
+            
             %fprintf('%i, %i: %s', i, j, query(awgdata.awg, 'SYST:ERR?')) % read error message in case waveform already existed
             fwrite(awgdata.awg, [sprintf('WLIS:WAV:DATA "%s",#5%05d', name, 2 * npts),...
                 typecast(data(j, :), 'uint8')]);
