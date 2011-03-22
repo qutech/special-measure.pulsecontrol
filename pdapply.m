@@ -9,6 +9,18 @@ if ~strcmp(pulse.format,'elem')
     changed=0;
     return;
 end
+
+% If pd is a cell array, apply each dictionary in sequence.  This allows
+% for some *neat* effects. :p
+if iscell(pd)
+   changed = 0;
+   for i=1:length(pd)
+     [pulse c2] = pdapply(pd{i},pulse)
+     changed = changed || c2;
+   end
+   return;
+end
+
 if ischar(pd)
     pd=pdload(pd);
 end
