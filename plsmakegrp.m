@@ -20,8 +20,6 @@ end
 if ~iscell(name)
     name = {name};
 end
-
-
             
 for k = 1:length(name)
     if(~isstruct(name{k}))
@@ -30,7 +28,7 @@ for k = 1:length(name)
     else
        grpdef=name{k};
     end
-    
+           
     if strfind(grpdef.ctrl, 'seq')
         fprintf('Sequence joined groups: %s\n',sprintf('%s ',grpdef.pulses.groups{:}));
         for m = 1:length(grpdef.pulses.groups)
@@ -42,7 +40,9 @@ for k = 1:length(name)
         end    
         return;
     end
-        
+       
+    pack = ~isempty(strfind(grpdef.ctrl,'pack'));
+    
     if ~ isfield(grpdef, 'varpar')
         grpdef.varpar = [];
     end
@@ -290,14 +290,36 @@ for k = 1:length(name)
             if ~isempty(strfind(ctrl, 'force')) || plslog(end).time(end) < lastupdate
                 %  modified since last upload (or upload forced)
 
+                % A little naughty; secretly pack all the pulse waveforms together for load...
+                if pack
+                   if any(~strcmp('wf',{grpdef.pulses.format}))
+                       error('Pack can only deal with waveforms.');
+                   end
+                   packdef = grpdef;
+                   packdef.pulses=[];
+                   packdef.pulses(1).format='wf';
+                   data=[grpdef.pulses.data];                   
+                   packdef.pulses(1).data.marker = [data.marker];
+                   packdef.pulses(1).data.wf = [data.wf];
+                   % awgload/zero doesn't use anything else.
+                else
+                   packdef = grpdef; 
+                end
+                  
                 if isempty(zerolen) || ~isempty(strfind(ctrl, 'clrzero'))
-                    zerolen = zeros(length(grpdef.pulses), length(grpdef.chan));
+                    zerolen = zeros(length(packdef.pulses), length(packdef.chan));
                 end
                 
                 if isempty(strfind(ctrl, 'local'))
-                    zerolen  = awgload(grpdef, ind, zerolen);
+                    zerolen  = awgload(packdef, ind, zerolen);
                 else
-                    zerolen = awgzero(grpdef, ind, zerolen);
+                    zerolen = awgzero(packdef, ind, zerolen);
+                end
+                
+                if pack
+                    for i=1:size(zerolen,2)
+                      zerolen(:,i)=zerolen(1,i)/length(grpdef.pulses);
+                    end
                 end
                 
                 % save update time in log.
@@ -306,6 +328,10 @@ for k = 1:length(name)
                 plslog(end).matrix = grpdef.matrix;
                 plslog(end).varpar = grpdef.varpar;
                 plslog(end).offset = grpdef.offset;
+                
+                if isfield(grpdef, 'dict')
+                  plslog(end).dict = grpdef.dict;
+                end
     
                 if isfield(grpdef, 'trafofn')
                     plslog(end).trafofn = grpdef.trafofn;

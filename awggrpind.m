@@ -22,5 +22,5 @@ if iscell(grp)
     end
     grp = cell2mat(grp);
 elseif any(grp > length(awgdata.pulsegroups))
-    error('Group index too large.');
+    awgerror('Group index too large.');
 end

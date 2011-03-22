@@ -31,14 +31,24 @@ if query(awgdata.awg, 'WLIS:SIZE?', '%s\n', '%i') == 25 % nothing loaded (except
     dosave = 1;
 end
 
+chunksize=65536;
 for i = 1:length(grp.pulses)
     
     data = uint16(min((grp.pulses(i).data.wf./awgdata.scale + 1)*2^13 - 1, 2^14-1)) + uint16(grp.pulses(i).data.marker) * 2^14;
     npts = size(data, 2);
     if ~any(awgdata.zeropls == npts) % create zero if not existing yet
         fprintf(awgdata.awg, sprintf('WLIS:WAV:NEW "zero_%08d",%d,INT', npts, npts));
-        fwrite(awgdata.awg, [sprintf('WLIS:WAV:DATA "zero_%08d",#7%07d', npts, 2 * npts),...
-            typecast(2^13-1 + zeros(1, npts, 'uint16'), 'uint8')]);
+        awgdata.waveforms{end+1}=sprintf('zero_%08d',npts);            
+        for os=0:chunksize:npts
+          if os + chunksize >= npts
+              fwrite(awgdata.awg, [sprintf('WLIS:WAV:DATA "zero_%08d",%d,%d,#7%07d', npts, os, npts-os,2 * (npts-os)),...
+                typecast(2^13-1 + zeros(1, npts-os, 'uint16'), 'uint8')]);
+          else
+              fwrite(awgdata.awg, [sprintf('WLIS:WAV:DATA "zero_%08d",%d,%d,#7%07d', npts, os, chunksize,2 * chunksize),...
+                typecast(2^13-1 + zeros(1, chunksize, 'uint16'), 'uint8')]);
+          end
+          fprintf(awgdata.awg,'');
+        end
         awgdata.zeropls(end+1) = npts;
         dosave = 1;
     end
@@ -69,9 +79,19 @@ for i = 1:length(grp.pulses)
             end
             
             %fprintf('%i, %i: %s', i, j, query(awgdata.awg, 'SYST:ERR?')) % read error message in case waveform already existed
-            fwrite(awgdata.awg, [sprintf('WLIS:WAV:DATA "%s",#5%05d', name, 2 * npts),...
-                typecast(data(j, :), 'uint8')]);
-            fprintf(awgdata.awg, '');% LF needed for raw interface
+            for os=0:chunksize:npts
+                if os + chunksize >= npts
+                    fwrite(awgdata.awg, [sprintf('WLIS:WAV:DATA "%s",%d,%d,#7%07d', name, os, npts-os,2 * (npts-os)),...
+                        typecast(data(j,(os+1):end), 'uint8')]);
+                else
+                    fwrite(awgdata.awg, [sprintf('WLIS:WAV:DATA "%s",%d,%d,#7%07d', name, os, chunksize,2 * chunksize),...
+                        typecast(data(j,(os+1):(os+chunksize)), 'uint8')]);
+                end
+                fprintf(awgdata.awg,'');
+            end
+%            fwrite(awgdata.awg, [sprintf('WLIS:WAV:DATA "%s",#5%05d', name, 2 * npts),...
+%                typecast(data(j, :), 'uint8')]);
+%            fprintf(awgdata.awg, '');% LF needed for raw interface
             
             zerolen(ind(i), j) = -npts;
         else

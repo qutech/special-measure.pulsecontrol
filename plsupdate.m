@@ -8,8 +8,6 @@ function plsupdate(newdef)
 
 % (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
 
-
-
 % Not implmented: Missing or nan entries of params are taken from previous values.
 
 global plsdata;
@@ -42,8 +40,8 @@ if isfield(newdef, 'matrix')
     plschng = 1;
 end
 
-if isfield(newdef, 'dict')
-    if ~strcmp(newdef.dict, grpdef.dict)
+if isfield(newdef, 'dict')    
+    if ~isfield(grpdef,'dict') || ~strcmp(newdef.dict, grpdef.dict)
         grpdef.dict=newdef.dict;
         plschng=1;
     end
@@ -70,6 +68,10 @@ if isfield(newdef, 'xval')
     plschng = 1;
 end
 
+if isfield(newdef,'ctrl')
+    grpdef.ctrl = newdef.ctrl;
+    plschng = 1;
+end
 
 if isfield(newdef, 'trafofn')
     if isempty(newdef.trafofn) && isfield(newdef, 'trafofn')
@@ -78,8 +80,6 @@ if isfield(newdef, 'trafofn')
     grpdef.trafofn = newdef.trafofn;
     plschng = 1;
 end
-
-
 
 % some may not be valid for 'grp' groups
 % allow channel changes?

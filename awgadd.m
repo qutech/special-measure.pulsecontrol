@@ -68,18 +68,10 @@ for k = 1:length(groups)
         grpdef.nrep = 1;
     end
 
-    npls = size(grpdef.pulseind, 2);
-    
-    if ~isfield(grpdef, 'jump')
-        if strfind(grpdef.ctrl, 'loop')
-            grpdef.jump = [npls; 1];
-        else
-            grpdef.jump = [];
-        end
-    end
+    npls = size(grpdef.pulseind, 2);    
 
     usetrig = (grpdef.nrep(1) ~= Inf) && isempty(strfind(grpdef.ctrl, 'notrig'));
-
+  
     if isempty(awgdata.pulsegroups)
         startline = 1;
         gind = [];
@@ -91,19 +83,49 @@ for k = 1:length(groups)
                 error('Number of pulses changed in group %s. Use awgrm first!', grpdef.name);
             end
         else
-            startline = awgdata.pulsegroups(end).seqind + sum(awgdata.pulsegroups(end).npulse);
+            startline = awgdata.pulsegroups(end).seqind + sum(awgdata.pulsegroups(end).nline);
         end
     end
-    if isempty(gind) % group not loaded yet, extend sequence 
-        fprintf(awgdata.awg, sprintf('SEQ:LENG %d', startline + usetrig + npls - 1));
-        gind = length(awgdata.pulsegroups)+1;        
+    
+    if isempty(gind) % group not loaded yet, extend sequence
+        gind = length(awgdata.pulsegroups)+1;
         awgdata.pulsegroups(gind).name = grpdef.name;
         awgdata.pulsegroups(gind).seqind = startline;
         awgdata.pulsegroups(gind).npulse = [npls usetrig];
+        if strfind(grpdef.ctrl,'pack')
+            awgdata.pulsegroups(gind).nline = 1+usetrig;
+            % Hack alert; way too much code assumes zl == pulselen.  For
+            % packed groups, we ignore it and work out the correct length
+            % ourselves.
+            zlmult=npls;
+            npls=1;
+        else
+            zlmult=1;
+            awgdata.pulsegroups(gind).nline = npls+usetrig;
+        end
+        fprintf(awgdata.awg, sprintf('SEQ:LENG %d', startline + awgdata.pulsegroups(gind).nline-1));
         dosave = 1;
-    elseif any(awgdata.pulsegroups(gind).nrep ~= grpdef.nrep) % nrep changed
-        dosave = 1;
+    else
+        if strfind(grpdef.ctrl,'pack')
+            zlmult = npls;
+            npls=1;
+        else
+            zlmult=1;
+        end
+        if any(awgdata.pulsegroups(gind).nrep ~= grpdef.nrep) % nrep changed
+          dosave = 1;
+        end
     end
+    
+    if ~isfield(grpdef, 'jump')
+        if strfind(grpdef.ctrl, 'loop')
+            grpdef.jump = [npls; 1];
+        else
+            grpdef.jump = [];
+        end
+    end
+    
+
     awgdata.pulsegroups(gind).nrep = grpdef.nrep;
     
     if usetrig
@@ -111,9 +133,7 @@ for k = 1:length(groups)
         for j = 2:nchan 
             fprintf(awgdata.awg, sprintf('SEQ:ELEM%d:WAV%d "zero_%08d"', startline, j, awgdata.triglen));
         end
-    end
-    
-
+    end   
     
     for i = 1:npls
         ind = i-1 + startline + usetrig;
@@ -124,8 +144,9 @@ for k = 1:length(groups)
                     fprintf(awgdata.awg, sprintf('SEQ:ELEM%d:WAV%d "%s_%05d_%d"', ind, awgdata.chans(j), ...
                         grpdef.name, grpdef.pulseind(i), find(j == grpdef.chan)));
                 else
+                    
                     fprintf(awgdata.awg, sprintf('SEQ:ELEM%d:WAV%d "zero_%08d"', ind, awgdata.chans(j), ...
-                        abs(zerolen(grpdef.pulseind(i), 1))));
+                        zlmult*abs(zerolen(grpdef.pulseind(i), 1))));
                 end
             end
         else
