@@ -141,25 +141,27 @@ switch pulse.format
                     end
 
                 case 'adprep'
-                    pulsetab(1, end+(1:2)) = pulsetab(1, end) + [1e-3, pulsedef(i).time(1)];
-                    if(length(pulsedef(i).val) <= 2)
-                        dir=[-1 1];
-                    else
-                        dir = pulsedef(i).val(3:4);
+                    if pulsedef(i).time(1) > 1e-11
+                        pulsetab(1, end+(1:2)) = pulsetab(1, end) + [1e-3, pulsedef(i).time(1)];
+                        if(length(pulsedef(i).val) <= 2)
+                            dir=[-1 1];
+                        else
+                            dir = pulsedef(i).val(3:4);
+                        end
+                        pulsetab(2:3, end-1) = pulsedef(i).val(1)  * dir;
+                        pulsetab(2:3, end) = pulsedef(i).val(2) * dir;
                     end
-                    pulsetab(2:3, end-1) = pulsedef(i).val(1)  * dir;
-                    pulsetab(2:3, end) = pulsedef(i).val(2) * dir;
-
-                case 'adread'                                        
-                    pulsetab(1, end+(1:2)) = pulsetab(1, end) + [1e-3, pulsedef(i).time(1)];                    
-                    if(length(pulsedef(i).val) <= 2)
-                        dir=[-1 1];
-                    else
-                        dir = pulsedef(i).val(3:4);
-                    end                    
-                    pulsetab(2:3, end-1) = pulsedef(i).val(2)  * dir;
-                    pulsetab(2:3, end) = pulsedef(i).val(1)  * dir;
-
+                case 'adread'
+                    if pulsedef(i).time(1) > 1e-11
+                        pulsetab(1, end+(1:2)) = pulsetab(1, end) + [1e-3, pulsedef(i).time(1)];
+                        if(length(pulsedef(i).val) <= 2)
+                            dir=[-1 1];
+                        else
+                            dir = pulsedef(i).val(3:4);
+                        end
+                        pulsetab(2:3, end-1) = pulsedef(i).val(2)  * dir;
+                        pulsetab(2:3, end) = pulsedef(i).val(1)  * dir;
+                    end
                 otherwise
                     error('Invalid pulse element %i: %s.\n', i, pulsedef(i).type)
             end
