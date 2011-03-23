@@ -15,7 +15,7 @@ end
 if iscell(pd)
    changed = 0;
    for i=1:length(pd)
-     [pulse c2] = pdapply(pd{i},pulse)
+     [pulse c2] = pdapply(pd{i},pulse);
      changed = changed || c2;
    end
    return;
@@ -24,19 +24,22 @@ end
 if ischar(pd)
     pd=pdload(pd);
 end
-
-for i=1:length(pulse.data)
-   if pulse.data(i).type(1) == '@' % dictionary pulse
-     if(isfield(pd,pulse.data(i).type(2:end)))
-        nel=getfield(pd,pulse.data(i).type(2:end));
-        ot = ~isnan(pulse.data(i).time);
-        ov = ~isnan(pulse.data(i).val);
-        nel.time(ot)=pulse.data(i).time(ot);
-        nel.val(ov)=pulse.data(i).val(ov);
-        changed=1;
-        pulse.data(i)=nel;
-     end
-   end
+changed = 1;
+while changed
+    changed=0;
+    for i=1:length(pulse.data)
+        if pulse.data(i).type(1) == '@' % dictionary pulse
+            if(isfield(pd,pulse.data(i).type(2:end)))
+                nel=getfield(pd,pulse.data(i).type(2:end));
+                ot = ~isnan(pulse.data(i).time);
+                ov = ~isnan(pulse.data(i).val);
+                nel.time(ot)=pulse.data(i).time(ot);
+                nel.val(ov)=pulse.data(i).val(ov);
+                changed=1;
+                pulse.data(i)=orderfields(nel,pulse.data(i));
+                changed=1;
+            end
+        end
+    end
 end
- 
 return

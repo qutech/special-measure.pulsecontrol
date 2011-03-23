@@ -90,7 +90,8 @@ for k = 1:length(groups)
     if isempty(gind) % group not loaded yet, extend sequence
         gind = length(awgdata.pulsegroups)+1;
         awgdata.pulsegroups(gind).name = grpdef.name;
-        awgdata.pulsegroups(gind).seqind = startline;
+        awgdata.pulsegroups(gind).seqind = startline;        
+        
         awgdata.pulsegroups(gind).npulse = [npls usetrig];
         if strfind(grpdef.ctrl,'pack')
             awgdata.pulsegroups(gind).nline = 1+usetrig;

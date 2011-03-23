@@ -41,10 +41,8 @@ if isfield(newdef, 'matrix')
 end
 
 if isfield(newdef, 'dict')    
-    if ~isfield(grpdef,'dict') || ~strcmp(newdef.dict, grpdef.dict)
-        grpdef.dict=newdef.dict;
-        plschng=1;
-    end
+    grpdef.dict=newdef.dict;
+    plschng=1;
 end
 
 if isfield(newdef, 'params')
@@ -70,6 +68,16 @@ end
 
 if isfield(newdef,'ctrl')
     grpdef.ctrl = newdef.ctrl;
+    if isempty(grpdef.ctrl) || isempty(strmatch(grpdef.ctrl(1:min([end find(grpdef.ctrl == ' ', 1)-1])), {'pls', 'grp', 'grpcat'}))
+    % format not given
+    if ~isstruct(grpdef.pulses) || isfield(grpdef.pulses, 'data')
+        grpdef.ctrl = ['pls ' grpdef.ctrl];
+    elseif isfield(grpdef.pulses, 'groups')
+        grpdef.ctrl = ['grp ' grpdef.ctrl];   
+    else
+        error('Invalid group format.');
+    end
+    end
     plschng = 1;
 end
 
