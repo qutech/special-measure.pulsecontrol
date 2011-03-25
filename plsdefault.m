@@ -7,6 +7,9 @@ function pulse = plsdefault(pulse)
 
 global plsdata;
 if ~isstruct(pulse) % database indices given
+    if pulse > length(plsdata.pulses)
+       error('Requested pulse %d, but only %d are defined.  Did you plssync?',pulse,length(plsdata.pulses)); 
+    end
     pulse = plsdata.pulses(pulse);        
     return;
     %     pulse = num2cell(pulse);
