@@ -84,7 +84,9 @@ switch ctrl
         end
         
     case 'ro'
-        load([plsdata.grpdir, 'pg_', group], 'grpdef');
+        warning('off', 'MATLAB:load:variableNotFound');
+        load([plsdata.grpdir, 'pg_', group], 'grpdef', 'zerolen');
+        warning('on', 'MATLAB:load:variableNotFound');       
         if strfind(grpdef.ctrl,'grp')
             val=[];
             for l=1:length(grpdef.pulses.groups)
@@ -93,8 +95,18 @@ switch ctrl
                 val=val(i,:);
             end            
         else            
-            pd = plsmakegrp(group,'',1); % minor bug; assume all pulses have same readout.
-            val = pd.pulses(1).data.readout;            
+            if size(zerolen,1) > 1
+              pd = plsmakegrp(group,'',[1 size(zerolen,1)]) ; % minor bug; assume all pulses have same readout.                        
+              val = [pd.pulses(1).data.readout ; pd.pulses(2).data.readout];            
+              if any(abs(diff(val,[],1)) > 1e-10)
+                  warning('Readout changes between pulses in %s\n',group);
+              end
+              val=val(1,:);
+            else
+              pd = plsmakegrp(group,'',1) ; % minor bug; assume all pulses have same readout.                        
+              val = pd.pulses.data(1).readout;                
+            end
+            
         end
     case 'zl'
         warning('off', 'MATLAB:load:variableNotFound');

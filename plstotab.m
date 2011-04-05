@@ -84,8 +84,7 @@ switch pulse.format
                 case 'fill'
                     fillpos = size(pulsetab, 2);
                     filltime = pulsedef(i).time(1);
-                    fillmarkpos = size(marktab,2);
-                    
+                    fillmarkpos = size(marktab,2);                    
                 case 'wait'
                     if pulsedef(i).time(1) > 1e-11
                         pulsetab(1, end+(1:2)) = pulsetab(1, end) + [1e-3, pulsedef(i).time(1)]; %pinf.tbase*1e6/pinf.clk.
@@ -97,9 +96,13 @@ switch pulse.format
                     end
 
                 case 'reload'
+                    % If we're filling the load, push the fillpos 1 forward
+                    % so we stretch the wait at the loadpos, not the ramp
+                    % to the loadpos                    
+                    fillload = (fillpos == size(pulsetab,2));                        
                     pulsetab(1, end+(1:4)) = pulsetab(1, end) + cumsum(pulsedef(i).time([1 2 1 3]));
                     pulsetab(2:3, end+(-3:0)) = [repmat(pulsedef(i).val(1:2)', 1, 2), zeros(2)];
-
+                    fillpos = fillpos + fillload;                    
                 case 'meas_o' % offset measurement
                     pulsetab(1, end+(1:2)) = pulsetab(1, end) + [1e-3, pulsedef(i).time(1)]; %pinf.tbase*1e6/pinf.clk.
                     pulsetab(2:3, end-1) = pulsetab(2:3,end-2);
@@ -126,8 +129,15 @@ switch pulse.format
                     end
 
                 case 'ramp'
+                    %allow for multiplies in ramps- helps get direction
+                    %right
+                    if length(pulsedef(i).val) ==3
+                        mult = pulsedef(i).val(3);
+                    else
+                        mult = 1;
+                    end
                     pulsetab(1, end+1) = pulsetab(1, end) + pulsedef(i).time(1);
-                    pulsetab(2:3, end) = pulsedef(i).val(1:2);
+                    pulsetab(2:3, end) = mult*pulsedef(i).val(1:2);
 
                 case 'comp'
                     comppos = size(pulsetab, 2)+1;
