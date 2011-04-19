@@ -43,7 +43,13 @@ switch ctrl
                 for i=1:length(grpdef.pulseind)
                     grpdef.pulseind(i)=find(pis==grpdef.pulseind(i));
                 end
-                val = plslog(le).xval(ind, grpdef.pulseind);
+                val=[];
+                for i=1:size(grpdef.pulseind(1))                  
+                  val = [val ; plslog(le).xval(:, grpdef.pulseind(i,:))];
+                end
+                if ~isempty(ind)
+                    val=val(ind,:);
+                end
             else
                 while(max(ind) > size(plslog(le).xval,1))
                     fprintf('Warning; not enough xvals on group %s.  Trying next log entry\n', ...
@@ -95,7 +101,7 @@ switch ctrl
                 val=val(i,:);
             end            
         else            
-            if size(zerolen,1) > 1
+            if exist('zerolen','var') && size(zerolen,1) > 1
               pd = plsmakegrp(group,'',[1 size(zerolen,1)]) ; % minor bug; assume all pulses have same readout.                        
               val = [pd.pulses(1).data.readout ; pd.pulses(2).data.readout];            
               if any(abs(diff(val,[],1)) > 1e-10)

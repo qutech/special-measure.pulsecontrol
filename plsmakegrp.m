@@ -91,14 +91,17 @@ for k = 1:length(name)
                 % Apply dictionary before varpars; avoids many random bugs.
                 if isfield(grpdef,'dict') && ~isempty(grpdef.dict) && strcmp(plsdef(i).format,'elem')
                     plsdef(i)=pdapply(grpdef.dict, plsdef(i));
-                end
-                
+                end                
+                mask = ~isnan(params);
                 % update parameters - could move to plstowf
                 if ~isempty(plsdef(i).pardef)
                     switch plsdef(i).format
                         case 'elem'
                             pardef = plsdef(i).pardef;
                             for n = 1:size(pardef, 1)
+                                if isnan(params(n))
+                                    continue;
+                                end
                                 if pardef(n, 2) < 0
                                     plsdef(i).data(pardef(n, 1)).time(-pardef(n, 2)) = params(n);
                                 else
@@ -109,6 +112,9 @@ for k = 1:length(name)
                         case 'tab'
                             pardef = plsdef(i).pardef;
                             for n = 1:size(pardef, 1)
+                                if isnan(params(n))
+                                    continue;
+                                end
                                 if pardef(n, 1) < 0
                                     plsdef(i).data.marktab(pardef(n, 2), -pardef(n, 1)) = params(n);
                                 else
@@ -191,7 +197,7 @@ for k = 1:length(name)
                         grpdef.pulses(i).xval = [];
                         grpdef.pulses(i).data.readout = pg.pulses(pind(i)).data.readout; % a bit of a hack.
                     else
-                        for ii=1:size(pg.pulses(pind(i)).data.readout,1)
+                        for ii=1:size(pg.pulses(pind(i)).data.readout,1)                            
                             roi=find(grpdef.pulses(pind(i)).data.readout(:,1) == pg.pulses(pind(i)).data.readout(ii,1));
                             if ~isempty(roi)
                                 grpdef.pulses(pind(i)).data.readout(roi(1),2:3) = pg.pulses(pind(i)).data.readout(ii,2:3);
