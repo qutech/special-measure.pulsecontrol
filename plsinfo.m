@@ -91,9 +91,11 @@ switch ctrl
         
     case 'ro'
         warning('off', 'MATLAB:load:variableNotFound');
-        load([plsdata.grpdir, 'pg_', group], 'grpdef', 'zerolen');
-        warning('on', 'MATLAB:load:variableNotFound');       
-        if strfind(grpdef.ctrl,'grp')
+        load([plsdata.grpdir, 'pg_', group], 'grpdef', 'zerolen','plslog');
+        warning('on', 'MATLAB:load:variableNotFound');  
+        if isfield(plslog(end),'readout')
+            val=plslog(end).readout;            
+        elseif strfind(grpdef.ctrl,'grp')
             val=[];
             for l=1:length(grpdef.pulses.groups)
                 val=[val ; plsinfo('ro',grpdef.pulses.groups{l})];

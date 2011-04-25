@@ -10,6 +10,8 @@ function grpdef = plsmakegrp(name, ctrl, ind)
 % (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
 
 
+
+
 global plsdata;
 global awgdata;
 
@@ -341,8 +343,25 @@ for k = 1:length(name)
                 plslog(end).params = grpdef.params;
                 plslog(end).matrix = grpdef.matrix;
                 plslog(end).varpar = grpdef.varpar;
-                plslog(end).offset = grpdef.offset;
+                plslog(end).offset = grpdef.offset;               
                 
+                if isfield(grpdef.pulses(1).data,'readout')
+                  readout=[];
+                  for ll=1:length(grpdef.pulses)
+                    if ~isempty(grpdef.pulses(ll).data.readout)
+                      readout(:,:,ll) = grpdef.pulses(ll).data.readout;
+                    end
+                  end
+                  if any(abs(diff(readout,[],3)) > 1e-10)
+                    warning('Readout changes between pulses in %s\n',name{k});
+                  end
+                  if(size(readout,1) > 0)
+                    plslog(end).readout = readout(:,:,1);
+                  else 
+                    plslog(end).readout=[];
+                  end
+                end
+              
                 if isfield(grpdef, 'dict')
                   plslog(end).dict = grpdef.dict;
                 end

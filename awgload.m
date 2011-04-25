@@ -27,6 +27,7 @@ if query(awgdata.awg, 'WLIS:SIZE?', '%s\n', '%i') == 25 % nothing loaded (except
     zdata=zeros(1,awgdata.triglen);
     zmarker=repmat(1,1,awgdata.triglen);
     awgloadwfm(zdata,zmarker,sprintf('trig_%08d',awgdata.triglen),1,1);
+                
     for l=1:length(offsets)
         awgloadwfm(zdata,zmarker,sprintf('zero_%08d_%d',awgdata.triglen,l),offsetchan(l),1);
     end
@@ -54,12 +55,12 @@ for i = 1:length(grp.pulses)
     
             if isempty(strmatch(name,awgdata.waveforms))                
               fprintf(awgdata.awg, sprintf('WLIS:WAV:NEW "%s",%d,INT', name, npts));
+              awgdata.waveforms{end+1}=name;  
               err = query(awgdata.awg, 'SYST:ERR?');
               if ~isempty(strfind(err,'E11113'))
                  fprintf(err(1:end-1));
                  error('Error loading waveform; AWG is out of memory.  Try awgclear(''all''); ');
-              end
-              awgdata.waveforms{end+1}=name;            
+              end              
             end            
             awgloadwfm(grp.pulses(i).data.wf(j,:), uint16(grp.pulses(i).data.marker(j,:)), name, grp.chan(j), 0);
             zerolen(ind(i), j) = -npts;
@@ -84,6 +85,7 @@ global awgdata;
 
 if exist('define','var') && define
    fprintf(awgdata.awg, sprintf('WLIS:WAV:NEW "%s",%d,INT', name, length(data))); 
+   awgdata.waveforms{end+1}=name;
 end
 chunksize=65536;
 if(size(data,1) > size(data,2))
