@@ -289,8 +289,16 @@ for k = 1:length(name)
         case 'check'
             
             for i = 1:length(ind)
-                if any(abs(grpdef.pulses(i).data.wf(:)) > awgdata.scale)
-                    fprintf('Pulse %i exceeds range.\n', i);
+                over=0;
+                if length(awgdata.scale) == 1 
+                    over = any(abs(grpdef.pulses(i).data.wf(:)) > awgdata.scale);
+                else
+                  for l=1:length(awgdata.scale)
+                      over = over || any(abs(grpdef.pulses(i).data.wf(l,:)) > awgdata.scale);
+                  end                  
+                end
+                if over
+                    fprintf('Pulse %d is too large\n',i);
                 end
             end
 

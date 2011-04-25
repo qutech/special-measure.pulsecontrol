@@ -132,7 +132,7 @@ for k = 1:length(groups)
     if usetrig
         fprintf(awgdata.awg, sprintf('SEQ:ELEM%d:WAV1 "trig_%08d"', startline, awgdata.triglen));
         for j = 2:nchan 
-            fprintf(awgdata.awg, sprintf('SEQ:ELEM%d:WAV%d "zero_%08d"', startline, j, awgdata.triglen));
+            fprintf(awgdata.awg, sprintf('SEQ:ELEM%d:WAV%d "zero_%08d_%d"', startline, j, awgdata.triglen, awgdata.zerochan(j)));
         end
     end   
     
@@ -144,10 +144,9 @@ for k = 1:length(groups)
                     % channel in group and not zero
                     fprintf(awgdata.awg, sprintf('SEQ:ELEM%d:WAV%d "%s_%05d_%d"', ind, awgdata.chans(j), ...
                         grpdef.name, grpdef.pulseind(i), find(j == grpdef.chan)));
-                else
-                    
-                    fprintf(awgdata.awg, sprintf('SEQ:ELEM%d:WAV%d "zero_%08d"', ind, awgdata.chans(j), ...
-                        zlmult*abs(zerolen(grpdef.pulseind(i), 1))));
+                else                    
+                    fprintf(awgdata.awg, sprintf('SEQ:ELEM%d:WAV%d "zero_%08d_%d"', ind, awgdata.chans(j), ...
+                        zlmult*abs(zerolen(grpdef.pulseind(i), 1)),awgdata.zerochan(j)));
                 end
             end
         else
