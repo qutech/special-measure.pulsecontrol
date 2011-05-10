@@ -25,6 +25,9 @@ pd{end}.time=now;
 
 save(fn,'pd');
 pd=pd{end};
+
+fn=[plsdata.grpdir, 'pd_', dict,'_last.mat'];
+save(fn,'pd');
 % Fixme; there should be code to find loaded groups that need updating
 % here.
     

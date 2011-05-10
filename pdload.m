@@ -10,11 +10,11 @@ global plsdata;
 if ~exist('opts','var')
     opts = '';
 end
-
-load([plsdata.grpdir, 'pd_', name]);
-
+tic
 if isempty(strfind(opts,'all'))
-  pd=pd{end};  
+  load([plsdata.grpdir, 'pd_', name,'_last']);
+else
+  load([plsdata.grpdir, 'pd_', name]);
 end
     
 return
