@@ -23,6 +23,7 @@ for k = 1:size(breaks, 2);
             
         case 'start'
             fprintf(awgdata.awg, 'AWGC:RUN');
+            awgcntrl('wait');
             
         case 'off'
             for i = chans
@@ -43,8 +44,12 @@ for k = 1:size(breaks, 2);
         case 'raw'
             %awgcntrl('stop');
             %awgcntrl('off');
-            for i = chans
-                fprintf(awgdata.awg, 'AWGC:DOUT%i:STAT 1', i);
+            if any(~awgcntrl('israw'))            
+              for i = chans
+                  fprintf(awgdata.awg, 'AWGC:DOUT%i:STAT 1', i);
+              end
+            else
+              fprintf('Already raw\n');
             end
             %awgcntrl('on');
             %awgcntrl('start');
@@ -52,9 +57,14 @@ for k = 1:size(breaks, 2);
         case 'amp'
             %awgcntrl('stop');
             %awgcntrl('off');
-            for i = chans
-                fprintf(awgdata.awg, 'AWGC:DOUT%i:STAT 0', i);
+            if any(awgcntrl('israw'))
+              for i = chans
+                 fprintf(awgdata.awg, 'AWGC:DOUT%i:STAT 0', i);
+              end
+            else
+              fprintf('Already amp\n');
             end
+            
             %awgcntrl('on');
             %awgcntrl('start');
             
