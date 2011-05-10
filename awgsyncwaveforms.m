@@ -2,6 +2,7 @@ function awgsyncwaveforms()
 % Make sure the list of pulses is awgdata is consistent with the awg.
 % we assume if the number of pulses is right, everything is.\
 global awgdata;
+  awgcntrl('clr');
   npls=str2num(query(awgdata.awg,'WLIS:SIZE?'));
   if isfield(awgdata,'waveforms') && length(awgdata.waveforms) == npls
       return;
