@@ -32,7 +32,7 @@ function pulse = plstotab(pulse)
 %       Optional val(2,3) moves the measurement point away from 0,0.  Makes
 %       meas_o obsolete.
 % meas_o: as meas, but measure at current voltages, not 0,0
-% ramp: ramp to val (row vector, one entry for each channel) in time.
+% ramp: ramp to val (row vector, one entry for each channel) in time.  opt val(3) is multiplier
 % comp: measurement compensation at val(1:2) (one for each channel) for duration time(1). 
 %       Ramps voltage to target and back over time(2) and time(3) at the beginning and 
 %       end of the stage, respectively. If length(val)>=4, val(3:4) are used as final value.
@@ -99,10 +99,13 @@ switch pulse.format
                     % If we're filling the load, push the fillpos 1 forward
                     % so we stretch the wait at the loadpos, not the ramp
                     % to the loadpos                    
-                    fillload = (fillpos == size(pulsetab,2));                        
-                    pulsetab(1, end+(1:4)) = pulsetab(1, end) + cumsum(pulsedef(i).time([1 2 1 3]));
-                    pulsetab(2:3, end+(-3:0)) = [repmat(pulsedef(i).val(1:2)', 1, 2), zeros(2)];
-                    fillpos = fillpos + fillload;                    
+                    % Ignore zero length loads
+                    if pulsedef(i).time(2) > 1e-11
+                      fillload = (fillpos == size(pulsetab,2));                        
+                      pulsetab(1, end+(1:4)) = pulsetab(1, end) + cumsum(pulsedef(i).time([1 2 1 3]));
+                      pulsetab(2:3, end+(-3:0)) = [repmat(pulsedef(i).val(1:2)', 1, 2), zeros(2)];
+                      fillpos = fillpos + fillload;                    
+                    end
                 case 'meas_o' % offset measurement
                     pulsetab(1, end+(1:2)) = pulsetab(1, end) + [1e-3, pulsedef(i).time(1)]; %pinf.tbase*1e6/pinf.clk.
                     pulsetab(2:3, end-1) = pulsetab(2:3,end-2);
@@ -187,7 +190,7 @@ switch pulse.format
         if ~isempty(fillpos)
             filltime = filltime - pulsetab(1, end);
             if filltime < 0
-                error('Pulse too long.');
+                error('Pulse too long by %g.',filltime);
             end
             pulsetab(1, fillpos+1:end) = pulsetab(1, fillpos+1:end) + filltime;
             if ~isempty(readpos)
