@@ -20,7 +20,11 @@ end
 % check format?
 
 if ~isempty(plsdata.pulses)
+    if strcmp(input('Pulse Exists. Overwrite? (yes/[no])? ','s'), 'yes') == 0
+      return;
+    else
     plsdata.pulses(plsnum) = orderfields(pulse, plsdata.pulses);
+    end
 else
     plsdata.pulses(plsnum) = pulse;
 end
