@@ -72,7 +72,9 @@ for k = 1:length(name)
             end
             
             grpdef.pulses(length(ind)+1:end) = [];
-            
+            if isfield(grpdef,'dict') && ~isempty(grpdef.dict)            
+                grpdef.dict=pdpreload(grpdef.dict);
+            end
             for m = 1:length(ind)
                 
                 i = floor((ind(m)-1)/npar)+1;
