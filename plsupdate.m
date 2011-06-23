@@ -13,10 +13,16 @@ function plsupdate(newdef)
 global plsdata;
 
 if length(newdef) > 1
-   for l=1:length(newdef)
-       plsupdate(newdef(l));
-   end
-   return;
+    if iscell(newdef)
+        for l=1:length(newdef)
+            plsupdate(newdef{l});
+        end
+    else        
+        for l=1:length(newdef)
+            plsupdate(newdef(l));
+        end
+    end
+    return;
 end
 
 file = [plsdata.grpdir, 'pg_', newdef.name];
