@@ -99,9 +99,15 @@ for j = 1:nchan
         % added small shifts to mitigate rounding errors 08/04/09. Never seen to matter.
         % below makes writes the pulse into data using lines to connect the
         % corners defined in pulstab
+        if 1
         data(j, mask) = (-pulsetab(j+1, i-1) * (time(mask) - pulsetab(1, i)) ...
             + pulsetab(j+1, i) * (time(mask) - pulsetab(1, i-1)))./...
             (pulsetab(1, i) -  pulsetab(1, i-1));
+        else
+          data(j, mask) = ((-pulsetab(j+1, i-1) + pulsetab(j+1,i)) * time(mask) + ...
+              pulsetab(j+1,i-1) * pulsetab(1, i) - pulsetab(j+1,i) * pulsetab(1, i-1))./...
+            (pulsetab(1, i) -  pulsetab(1, i-1));
+        end
         
     end
 end

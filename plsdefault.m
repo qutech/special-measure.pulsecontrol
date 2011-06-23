@@ -39,7 +39,7 @@ end
 
 
 % only implemented for single pulse
-if ~isfield(pulse, 'format') || isempty(pulse(1).format)
+if ~isfield(pulse(1), 'format') || isempty(pulse(1).format)
     if isreal(pulse.data)
         pulse.format = 'ind';
     elseif isfield(pulse.data, 'type')

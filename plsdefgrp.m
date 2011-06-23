@@ -47,8 +47,14 @@ function plsdefgrp(grpdef)
 
 
 if length(grpdef) > 1
-    for l=1:length(grpdef)
+    if iscell(grpdef)
+      for l=1:length(grpdef)
+        plsdefgrp(grpdef{l});
+      end        
+    else
+      for l=1:length(grpdef)
         plsdefgrp(grpdef(l));
+      end
     end
     return;
 end
