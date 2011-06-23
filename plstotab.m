@@ -204,11 +204,13 @@ switch pulse.format
 
         pulse.data = struct;
         pulse.data.pulsetab = pulsetab;
-        pulse.data.marktab = marktab;
+        pulse.data.marktab = sortrows(marktab',1)';
         pulse.data.readout = readout;
         pulse.format = 'tab';
         
     otherwise
         error('Invalid format %s.', pulse.format);
 end
+
+
         
