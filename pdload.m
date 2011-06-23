@@ -10,7 +10,7 @@ global plsdata;
 if ~exist('opts','var')
     opts = '';
 end
-tic
+
 if isempty(strfind(opts,'all'))
   load([plsdata.grpdir, 'pd_', name,'_last']);
 else
