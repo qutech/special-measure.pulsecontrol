@@ -19,7 +19,8 @@ if strcmp(groups, 'pack')
    return;
 end
 if strcmp(groups, 'all')
-    groups = query(awgdata.awg, 'WLIS:SIZE?', '%s\n', '%i')-1:-1:1;
+%    groups = query(awgdata.awg, 'WLIS:SIZE?', '%s\n', '%i')-1:-1:1;
+    fprintf(awgdata.awg,'WLIS:WAV:DEL ALL\n')
     logentry('Cleared all pulses.');
     % Mark all pulse groups as not loaded
     g=plsinfo('ls');
@@ -33,6 +34,7 @@ if strcmp(groups, 'all')
 %          fprintf('Marking group ''%s'' as unloaded\n',g{i});
        end
     end
+    return;
 end
     
 
