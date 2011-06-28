@@ -36,7 +36,7 @@ else
         if(~isempty(pulses(i).format))
           switch pulses(i).format
               case 'wf'
-                  len = size(pulses(i).data.wf, 2)/plsdata.tbase;
+                  len = size(pulses(i).data.wf, 2)/(plsdata.tbase*awgdata.clk/1e9);
               case 'tab'
                   len = max(pulses(i).data.pulsetab(1,:));
               otherwise
