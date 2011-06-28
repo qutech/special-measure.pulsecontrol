@@ -24,14 +24,6 @@ function pulse = plstowf(pulse, dict)
 global plsdata;
 pulse = plsdefault(pulse);
 
-% read from database, assumed to have valid format
-% if ~isstruct(pulse)
-%     pulse = plsdata(pulse);
-% end
-%while strcmp(pulse.format, 'ind')
-%    pulse = plsdata.pulses(pulse.data);
-%end
-
 if strcmp(pulse.format, 'wf')
     return
 end

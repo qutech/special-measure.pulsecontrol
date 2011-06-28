@@ -10,8 +10,6 @@ function grpdef = plsmakegrp(name, ctrl, ind)
 % (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
 
 
-
-
 global plsdata;
 global awgdata;
 
@@ -227,28 +225,7 @@ for k = 1:length(name)
             [grpdef.pulses.format] = deal('wf');
             
             %grpdef = rmfield(grpdef, 'groups', 'matrix', 'offset');
-        case 'grpcat'
-            
-            groupdef = grpdef.pulses;
-            grpdef.pulses = struct([]);
-            
-            nchan = size(grpdef.matrix, 2); % # input channels to matrix
-            
-            %         if ~isfield(groupdef, 'chan')
-            %             [groupdef.chan] = deal(length(groupdef.groups), nan(nchan));
-            %         end
-            %
-            %         if ~isfield(groupdef, 'markchan')
-            %             groupdef.markchan = groupdef.chan;
-            %         end
-            
-            for j = 1:length(groupdef.groups)
-                pg = plsmakegrp(groupdef.groups{j});
-                grpdef.pulses = [grpdef.pulses pg.pulses];
-            end
-            [grpdef.pulses.format] = deal('wf');
-            ind=1:length(grpdef.pulses);
-            %grpdef = rmfield(grpdef, 'groups', 'matrix', 'offset');
+    
         otherwise
             error('Group control %s not understood.\n',grpdef.ctrl);
     end
@@ -330,6 +307,7 @@ for k = 1:length(name)
                     zerolen = zeros(length(packdef.pulses), length(packdef.chan));
                 end
                 
+                % Actually handle the upload...
                 if isempty(strfind(ctrl, 'local'))
                     zerolen  = awgload(packdef, ind, zerolen);
                 else
