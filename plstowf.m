@@ -22,6 +22,7 @@ function pulse = plstowf(pulse, dict)
 
 
 global plsdata;
+global awgdata;
 pulse = plsdefault(pulse);
 
 if strcmp(pulse.format, 'wf')
@@ -69,7 +70,7 @@ pulsetab = pulseinf.pulsetab;
 
 nchan = size(pulsetab, 1)-1;
 
-npoints = round(max(pulsetab(1, :)) * plsdata.tbase);
+npoints = round(max(pulsetab(1, :)) * plsdata.tbase * awgdata.clk/1e9);
 
 data = zeros(nchan, npoints+1);
 time = linspace(pulsetab(1, 1), pulsetab(1, end), npoints+1);

@@ -91,7 +91,7 @@ chunksize=65536;
 if(size(data,1) > size(data,2))
     data=data';
 end
-    data = uint16(min(((awgdata.offset(min(chan,end)) + data)./awgdata.scale(chan) + 1)*2^13 - 1, 2^14-1)) + uint16(marker) * 2^14;
+    data = uint16(min(((awgdata.offset(min(chan,end)) + data)./awgdata.scale(chan) + 1)*2^(awgdata.bits-1) - 1, 2^(awgdata.bits)-1)) + uint16(marker) * 2^(awgdata.bits);
     npts = length(data);
     
     for os=0:chunksize:npts

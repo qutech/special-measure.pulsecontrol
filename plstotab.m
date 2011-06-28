@@ -190,7 +190,8 @@ switch pulse.format
         if ~isempty(fillpos)
             filltime = filltime - pulsetab(1, end);
             if filltime < 0
-                error('Pulse too long by %g.',filltime);
+                pulsetab
+                error('Pulse too long by %g.',-filltime);
             end
             pulsetab(1, fillpos+1:end) = pulsetab(1, fillpos+1:end) + filltime;
             if ~isempty(readpos)
