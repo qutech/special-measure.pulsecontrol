@@ -12,7 +12,8 @@ d = dir(sprintf('%sawgdata_*', plsdata.grpdir));
 [mi, mi] = max([d.datenum]);
 load([plsdata.grpdir, d(mi).name]);
 
-awg = awgdata.awg;
-awgdata = data;
-awgdata.awg = awg;
+if isfield(awgdata,'awg')
+    data.awg=awgdata.awg;
+end
+awgdata=data;
 
