@@ -22,7 +22,11 @@ global plsdata;
 if strcmp(computer, 'GLNX86')
     plsdata.datafile = '~ygroup/qDots/awg_pulses/plsdata_1110.mat';
 else
-    plsdata.datafile = 'z:/qDots/awg_pulses/plsdata_1110.mat';
+    if exist('z:/qDots','file')
+      plsdata.datafile = 'z:/qDots/awg_pulses/plsdata_1110.mat';
+    else
+      plsdata.datafile = 'y:/qDots/awg_pulses/plsdata_1110.mat';  
+    end
 end
 plssync('load');
 

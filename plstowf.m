@@ -150,4 +150,9 @@ end
 pulse.data.marker = marker;
 pulse.data.wf = data + vc;
 pulse.data.readout = pulseinf.readout;
+if isfield(pulseinf,'elem')
+    pulse.data.elem=pulseinf.elem;
+end
+pulse.data.pulsetab = pulsetab;
+pulse.data.marktab = marktab;
 pulse.format = 'wf';
