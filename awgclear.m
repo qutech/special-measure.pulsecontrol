@@ -23,7 +23,9 @@ if strcmp(groups, 'all')
     fprintf(awgdata.awg,'WLIS:WAV:DEL ALL\n')
     logentry('Cleared all pulses.');
     % Mark all pulse groups as not loaded
-    g=plsinfo('ls');
+    if 1
+        g=plsinfo('ls');
+    end
     for i=1:length(g)
        load([plsdata.grpdir, 'pg_', g{i}, '.mat'], 'plslog');       
        if(plslog(end).time(end) <= 0)

@@ -114,5 +114,14 @@ for k = 1:size(breaks, 2);
                 err2 = err;
                 i = i + 1;
             end
+        case 'norm'
+          for i = 1:4
+            fprintf(awgdata.awg, 'SOUR%i:VOLT:AMPL .6', i);
+          end
+        case 'dbl'
+          for i = 1:4
+            fprintf(awgdata.awg, 'SOUR%i:VOLT:AMPL 1.2', i);
+          end
+
     end
 end
