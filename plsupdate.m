@@ -127,4 +127,4 @@ end
 save(file, '-append', 'grpdef', 'lastupdate');
 
 logentry('Updated group %s.', grpdef.name);
-fprintf('Updated group %s.\n', grpdef.name);
+%fprintf('Updated group %s.\n', grpdef.name);

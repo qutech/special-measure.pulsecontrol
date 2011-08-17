@@ -208,6 +208,7 @@ switch pulse.format
         pulse.data.pulsetab = pulsetab;
         pulse.data.marktab = sortrows(marktab',1)';
         pulse.data.readout = readout;
+        pulse.data.elem=pulsedef;  % Copy forward documentation.
         pulse.format = 'tab';
         
     otherwise

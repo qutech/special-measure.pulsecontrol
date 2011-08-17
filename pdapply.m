@@ -1,10 +1,13 @@
-function [pulse changedout]=pdapply(pd,pulse)
-%function [pulse changed]=pdapply(pd, pulse)
+function [pulse changedout]=pdapply(pd,pulse,time)
+%function [pulse changed]=pdapply(pd, pulse,time)
 % Apply a pulse dictionary to a pulse.  Return the new pulse.  Changed is
 % true if the application was non-trivial
 
 % (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
 
+if ~exist('time','var')
+    time=[];
+end
 if ~strcmp(pulse.format,'elem')
     changedout=0;
     return;
@@ -15,7 +18,7 @@ end
 if iscell(pd)
    changed = 0;
    for i=1:length(pd)
-     [pulse c2] = pdapply(pd{i},pulse);
+     [pulse c2] = pdapply(pd{i},pulse,time);
      changed = changed || c2;
    end
    changedout = changed;
@@ -23,7 +26,7 @@ if iscell(pd)
 end
 
 if ischar(pd)
-    pd=pdload(pd);
+    pd=pdload(pd,time);
 end
 changedout=0;
 changed = 1;

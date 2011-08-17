@@ -1,21 +1,30 @@
-function grpdef = plsmakegrp(name, ctrl, ind)
-% grpdef = plsmakegrp(name, ctrl, ind)
+function grpdef = plsmakegrp(name, ctrl, ind, opts)
+% grpdef = plsmakegrp(name, ctrl, ind, opts)
 % Covert pulses in pulsegroup to wf format.
 % name: group name.
 % ctrl: 'plot', 'check', 'upload'
 %       for maintenance/debugging: 'clrzero', 'local'.
 %       These may mess with the upload logging, so use with care.
 % ind: optional pulse index. The default is pulseind or all pulses.
-
+% opts is an option struct
+%   opts.time ; time to recreate group at.  
+% time: optional, make grp as it was at time..
 % (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
-
 
 global plsdata;
 global awgdata;
 
-if nargin < 2
-    ctrl = '';
+if ~exist('ctrl','var')
+    ctrl='';
 end
+if ~exist('ind','var')
+    ind=[];
+end
+if ~exist('opts','var')
+    opts=struct();
+end
+
+opts=def(opts,'time',[]);
 
 if ~iscell(name)
     name = {name};
@@ -24,19 +33,26 @@ end
 for k = 1:length(name)
     if(~isstruct(name{k}))
        zerolen = []; % avoid using zerolen from previous group.
+       plslog=[];
        load([plsdata.grpdir, 'pg_', name{k}]);
     else
        grpdef=name{k};
+    end
+    
+    if exist('plslog','var')  && ~isempty(plslog) && ~isempty(opts.time)
+        le=plslog_logentry(plslog,opts.time);                 
+        grpdef.params=plslog(le).params;
+        grpdef.matrix=plslog(le).matrix;
+        grpdef.varpar=plslog(le).varpar;
+        grpdef.offset=plslog(le).offset;
+        grpdef.dict=plslog(le).dict;
+        grpdef.readout=plslog(le).readout;        
     end
            
     if strfind(grpdef.ctrl, 'seq')
         fprintf('Sequence joined groups: %s\n',sprintf('%s ',grpdef.pulses.groups{:}));
         for m = 1:length(grpdef.pulses.groups)
-            if ~exist('ind','var')
-            plsmakegrp(grpdef.pulses.groups{m},ctrl);
-            else
-            plsmakegrp(grpdef.pulses.groups{m},ctrl,ind);
-            end
+           plsmakegrp(grpdef.pulses.groups{m},ctrl,ind,opts);
         end    
         return;
     end
@@ -71,7 +87,7 @@ for k = 1:length(name)
             
             grpdef.pulses(length(ind)+1:end) = [];
             if isfield(grpdef,'dict') && ~isempty(grpdef.dict)            
-                grpdef.dict=pdpreload(grpdef.dict);
+                grpdef.dict=pdpreload(grpdef.dict,opts.time);
             end
             for m = 1:length(ind)
                 
@@ -92,7 +108,7 @@ for k = 1:length(name)
                 
                 % Apply dictionary before varpars; avoids many random bugs.
                 if isfield(grpdef,'dict') && ~isempty(grpdef.dict) && strcmp(plsdef(i).format,'elem')
-                    plsdef(i)=pdapply(grpdef.dict, plsdef(i));
+                    plsdef(i)=pdapply(grpdef.dict, plsdef(i),opts.time);
                 end                
                 mask = ~isnan(params);
                 % update parameters - could move to plstowf
@@ -219,7 +235,7 @@ for k = 1:length(name)
                 end
             end
             
-            if nargin < 3
+            if nargin < 3 || isempty(ind)
                 ind = 1:length(grpdef.pulses);
             else
                 grpdef.pulses = grpdef.pulses(ind);
@@ -368,10 +384,39 @@ for k = 1:length(name)
                 
                 save([plsdata.grpdir, 'pg_', name{k}], '-append', 'plslog', 'zerolen');
                 logentry('Uploaded group %s, revisions %i.', grpdef.name, length(plslog));
-                fprintf(' in upload of group %s.\n', grpdef.name);
+              %  fprintf(' in upload of group %s.\n', grpdef.name);
             else
                 fprintf('Skipping group %s.\n', grpdef.name);
             end
 
     end
 end
+
+
+
+% Apply a default.
+function s=def(s,f,v)
+  if(~isfield(s,f))
+      s=setfield(s,f,v);
+  end
+return;
+
+% Find an appropriate log entry.
+function l=plsinfo_logentry(plslog, time)
+
+l = length(plslog);
+
+if ~isempty(time)
+    while plslog(l).time(1) > time        
+        l = l - 1;
+    end
+    
+    if l == 0
+        error('Time travellers beware!');
+    end
+    
+    if length(plslog(l).time) > 1 && -plslog(l).time(2) < time
+         error('Group not loaded at requested time!');
+    end
+end
+return

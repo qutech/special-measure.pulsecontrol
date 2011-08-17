@@ -25,7 +25,9 @@ if strcmp(groups, 'all')
     end
     logentry('Cleared all pulses.');
     % Mark all pulse groups as not loaded
-    g=plsinfo('ls');
+    if 1
+        g=plsinfo('ls');
+    end
     for i=1:length(g)
        load([plsdata.grpdir, 'pg_', g{i}, '.mat'], 'plslog');       
        if(plslog(end).time(end) <= 0)

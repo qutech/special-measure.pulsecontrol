@@ -144,7 +144,11 @@ for c=1:length(clk)
   pulse.data(c).marker = marker;
   pulse.data(c).wf = data + vc;
   pulse.data(c).readout = pulseinf.readout;
-  pulse.data(c).clk = clk(c);  
-end
+  if isfield(pulseinf,'elem')
+    pulse.data(c).elem=pulseinf.elem;
+  end
+  pulse.data(c).clk = clk(c);
+pulse.data.pulsetab = pulsetab;
+pulse.data.marktab = marktab;
 pulse.format = 'wf';
 

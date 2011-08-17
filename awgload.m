@@ -78,8 +78,7 @@ for a=1:length(awgdata)
             end
         end
     end
-    err = query(awgdata(a).awg, 'SYST:ERR?');
-    fprintf('%d: %s\n',a,err(1:end-1));
+awgcntrl('clr');
 end
 
 if dosave

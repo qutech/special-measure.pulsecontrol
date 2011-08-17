@@ -16,5 +16,5 @@ if exist('awgdata','var') && isfield(awgdata,'awg')
      data(a).awg = awgdata(a).awg;
   end
 end
-awgdata = data;
+awgdata=data;
 
