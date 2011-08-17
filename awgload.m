@@ -69,8 +69,7 @@ for i = 1:length(grp.pulses)
         end
     end
 end
-err = query(awgdata.awg, 'SYST:ERR?');
-fprintf(err(1:end-1)); 
+awgcntrl('clr');
 
 if dosave
     awgsavedata;

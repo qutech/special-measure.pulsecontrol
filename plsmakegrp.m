@@ -39,7 +39,7 @@ for k = 1:length(name)
        grpdef=name{k};
     end
     
-    if ~isempty(plslog) && ~isempty(opts.time)
+    if exist('plslog','var')  && ~isempty(plslog) && ~isempty(opts.time)
         le=plslog_logentry(plslog,opts.time);                 
         grpdef.params=plslog(le).params;
         grpdef.matrix=plslog(le).matrix;
@@ -395,7 +395,7 @@ for k = 1:length(name)
                 
                 save([plsdata.grpdir, 'pg_', name{k}], '-append', 'plslog', 'zerolen');
                 logentry('Uploaded group %s, revisions %i.', grpdef.name, length(plslog));
-                fprintf(' in upload of group %s.\n', grpdef.name);
+              %  fprintf(' in upload of group %s.\n', grpdef.name);
             else
                 fprintf('Skipping group %s.\n', grpdef.name);
             end

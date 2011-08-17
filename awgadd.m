@@ -32,7 +32,7 @@ for k = 1:length(groups)
         plsmakegrp(groups{k},'upload');
         ts2 = toc;
         awgcntrl('wait');
-        fprintf('Load time=%f secs, wait time=%f\n',toc-tstart,toc-ts2);
+      %  fprintf('Load time=%f secs, wait time=%f\n',toc-tstart,toc-ts2);
         load([plsdata.grpdir, 'pg_', groups{k}]);        
     end
 
@@ -181,7 +181,7 @@ for k = 1:length(groups)
             fprintf('%i/%i pulses added.\n', i, npls);
         end
     end
-    fprintf('Group load time: %g secs\n',toc-gstart);
+    %fprintf('Group load time: %g secs\n',toc-gstart);
 
     jstart=toc;
     % event jumps
@@ -202,11 +202,14 @@ for k = 1:length(groups)
     seqlog(end).jump = grpdef.jump;
 
     save([plsdata.grpdir, 'pg_', groups{k}], '-append', 'seqlog');
-    fprintf('Jump program time: %f secs\n',toc-jstart);
+    %fprintf('Jump program time: %f secs\n',toc-jstart);
     wstart=toc;
     awgcntrl('wait');
-    fprintf('Wait time: %f secs; total time %f secs\n',toc-wstart,toc-astart);
-    fprintf('Added group %s on index %i. %s', grpdef.name, gind, query(awgdata.awg, 'SYST:ERR?'));
+    %fprintf('Wait time: %f secs; total time %f secs\n',toc-wstart,toc-astart);
+    err=query(awgdata.awg, 'SYST:ERR?');
+    if isempty(strfind(err, 'No error'))
+    fprintf('Added group %s on index %i. %s', grpdef.name, gind, err);
+    end
     logentry('Added group %s on index %i.', grpdef.name, gind);
 end
 if dosave

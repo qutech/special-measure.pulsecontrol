@@ -64,7 +64,9 @@ for k = 1:length(groups)
     seqlog(end).jump = grpdef.jump;
 
     save([plsdata.grpdir, 'pg_', awgdata.pulsegroups(groups(k)).name], '-append', 'seqlog');
-    
-    fprintf('Updated group %s on index %i. %s', grpdef.name, groups(k), query(awgdata.awg, 'SYST:ERR?'));
+    err=query(awgdata.awg, 'SYST:ERR?');
+    if isempty(strfind(err, 'No error'))
+        fprintf('Updated group %s on index %i. %s', grpdef.name, groups(k), err));
+    end
     logentry('Updated group %s on index %i.', grpdef.name, groups(k));
 end

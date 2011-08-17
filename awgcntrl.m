@@ -108,7 +108,7 @@ for k = 1:size(breaks, 2);
             while 1
                 err = query(awgdata.awg, 'SYST:ERR?');
                 if strcmp(err(1:end-1), '0,"No error"')
-                    fprintf('%i errors. Last %s', i, err2);
+                    %fprintf('%i errors. Last %s', i, err2);
                     return;
                 end
                 err2 = err;
