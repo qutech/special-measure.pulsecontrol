@@ -13,7 +13,7 @@ end
 
 if iscell(grp)   
     for i = 1:length(grp)
-        grp{i} = max(strmatch(grp{i}, {awgdata.pulsegroups.name}, 'exact'));
+        grp{i} = max(strmatch(grp{i}, {awgdata(1).pulsegroups.name}, 'exact'));
         if isempty(grp{i})
             grp{i} = nan;
             fprintf('Group not loaded.\n');
@@ -21,6 +21,6 @@ if iscell(grp)
         end           
     end
     grp = cell2mat(grp);
-elseif any(grp > length(awgdata.pulsegroups))
+elseif any(grp > length(awgdata(1).pulsegroups))
     awgerror('Group index too large.');
 end

@@ -13,10 +13,12 @@ global awgdata;
 
 if strcmp(grp, 'all')
     awgcntrl('stop');
-    fprintf(awgdata.awg, 'SEQ:LENG 0');
-    awgdata.pulsegroups = [];
-    awgdata.seqpulses = [];
-    awgsavedata;
+    for a=1:length(awgdata)
+        fprintf(awgdata(a).awg, 'SEQ:LENG 0');
+        awgdata(a).pulsegroups = [];
+        awgdata(a).seqpulses = [];
+        awgsavedata;
+    end
     return;
 end
 
@@ -29,16 +31,19 @@ end
 awgcntrl('stop');
 
 if exist('ctrl','var') && strfind(ctrl, 'after')
-    fprintf(awgdata.awg, 'SEQ:LENG %d', awgdata.pulsegroups(grp).seqind-1 + sum(awgdata.pulsegroups(grp).npulse));
-    awgdata.seqpulses(awgdata.pulsegroups(grp).seqind + sum(awgdata.pulsegroups(grp).npulse):end) = [];
-    awgdata.pulsegroups(grp+1:end) = [];
+    for a=1:length(awgdata)
+      fprintf(awgdata(a).awg, 'SEQ:LENG %d', awgdata(a).pulsegroups(grp).seqind-1 + sum(awgdata(a).pulsegroups(grp).npulse));
+      awgdata(a).seqpulses(awgdata(a).pulsegroups(grp).seqind + sum(awgdata(a).pulsegroups(grp).npulse):end) = [];
+      awgdata(a).pulsegroups(grp+1:end) = [];
+    end
     % may miss trigger line.
     return;
 end
-
-fprintf(awgdata.awg, 'SEQ:LENG %d', awgdata.pulsegroups(grp).seqind-1);
-awgdata.seqpulses(awgdata.pulsegroups(grp).seqind:end) = [];
-groups = {awgdata.pulsegroups(grp+1:end).name};
-awgdata.pulsegroups(grp:end) = [];
+for a=1:length(awgdata)
+  fprintf(awgdata(a).awg, 'SEQ:LENG %d', awgdata(a).pulsegroups(grp).seqind-1); 
+  awgdata(a).seqpulses(awgdata(a).pulsegroups(grp).seqind:end) = [];
+  groups = {awgdata(a).pulsegroups(grp+1:end).name};
+  awgdata(a).pulsegroups(grp:end) = [];
+end
 % log unloading here if necessary
 awgadd(groups);

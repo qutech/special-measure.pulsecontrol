@@ -13,7 +13,7 @@ global plsdata;
 global awgdata;
 
 if nargin >= 2 && ~ischar(group)
-    group = awgdata.pulsegroups(group).name;
+    group = awgdata(1).pulsegroups(group).name;
 end
 if ~exist('time','var')
     time=[];

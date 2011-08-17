@@ -18,7 +18,7 @@
 global awgdata;
 global plsdata;
 
-
+tic;
 if strcmp(computer, 'GLNX86')
     plsdata.datafile = '~ygroup/qDots/awg_pulses/plsdata_1110.mat';
 else
@@ -26,22 +26,13 @@ else
 end
 plssync('load');
 
+% Hack that only makes sense in our setup.
 if exist('smdata', 'var') && isfield(smdata, 'inst')
-    awgdata.awg = smdata.inst(sminstlookup('AWG5000')).data.inst;
-    awgloaddata;
-%     awgdata.chans = 1:4;
-%     awgdata.scale = 600/142;
-%     awgdata.pulsegroups = [];
-%     awgdata.zeropls = [];
-%     awgdata.triglen = 1000;
-%     awgdata.clk = 1e9;
+    awgdata(1).awg = smdata.inst(sminstlookup('AWG5000')).data.inst;
+    awgdata(2).awg = smdata.inst(sminstlookup('AWG7000')).data.inst;
 end
-
+awgloaddata;
 return;
-
-for i = 1:4
-    fprintf(awgdata.awg, 'SOUR%i:VOLT:AMPL .6', i);
-end
 
 % using different interfaces
 %awg = tcpip('140.247.189.142', 4000); % slow

@@ -9,110 +9,125 @@ function  val = awgcntrl(cntrl, chans)
 
 
 global awgdata;
-
-if nargin <2
-    chans = awgdata.chans;
+    val=[];
+    if nargin <2
+        chans = [];
+    end
+    
+    breaks = [regexp(cntrl, '\<\w'); regexp(cntrl, '\w\>')];
+    
+    for k = 1:size(breaks, 2);
+        switch cntrl(breaks(1, k):breaks(2, k))
+            case 'stop'
+                for a=1:length(awgdata)
+                  fprintf(awgdata(a).awg, 'AWGC:STOP');
+                end
+                
+            case 'start'
+                for a=1:length(awgdata)
+                  fprintf(awgdata(a).awg, 'AWGC:RUN');
+                end
+                awgcntrl('wait');
+                
+            case 'off'
+                for a=1:length(awgdata)
+                   for i = ch(awgdata(a), chans)
+                     fprintf(awgdata(a).awg, 'OUTPUT%i:STAT 0', i);
+                    end
+                end
+            case 'on'
+                for a=1:length(awgdata)
+                   for i = ch(awgdata(a), chans)
+                     fprintf(awgdata(a).awg, 'OUTPUT%i:STAT 1', i);
+                   end
+                end
+                
+                
+            case 'wait'
+                for a=1:length(awgdata)
+                  to = awgdata(a).awg.timeout;
+                  awgdata(a).awg.timeout = 600;
+                  query(awgdata(a).awg, '*OPC?');
+                  awgdata(a).awg.timeout = to;
+                end
+                
+            case 'raw'
+               if any(any(~awgcntrl('israw')))
+                   for a=1:length(awgdata)
+                     for i = ch(awgdata(a), chans)
+                       fprintf(awgdata(a).awg, 'AWGC:DOUT%i:STAT 1', i);
+                     end
+                   end
+                else
+                    fprintf('Already raw\n');
+                end
+               
+            case 'amp'
+               if any(any(~awgcntrl('israw')))
+                   for a=1:length(awgdata)
+                     for i = ch(awgdata(a), chans)
+                       fprintf(awgdata(a).awg, 'AWGC:DOUT%i:STAT 0', i);
+                     end
+                   end
+                else
+                    fprintf('Already amp\n');
+                end
+         
+            case 'israw'
+                val=[];
+                for a=1:length(awgdata)
+                    for i = ch(awgdata(a), chans)
+                        fprintf(awgdata(a).awg, 'AWGC:DOUT%i:STAT?',i);
+                        val(end+1) = fscanf(awgdata(a).awg,'%f');
+                    end
+                end
+                
+            case 'exton'    %adds external DC to outputs specified in chans
+                for a=1:length(awgdata)
+                  for i = ch(awgdata(a),chans)
+                    fprintf(awgdata(a).awg, 'SOUR%i:COMB:FEED "ESIG"', i);
+                  end
+                end
+                
+            case 'extoff'   %turns off external DC
+                for a=1:length(awgdata)
+                  for i = ch(awgdata(a),chans)
+                    fprintf(awgdata(a).awg, 'SOUR%i:COMB:FEED ""', i);
+                  end
+                end
+            case 'isexton'
+                val=[];
+                for a=1:length(awgdata)
+                    for i = ch(awgdata(a), chans)                        
+                        fprintf(awgdata(a).awg, 'SOUR%i:COMB:FEED?',i);
+                        val(end+1) = strcmp(fscanf(awgdata(a).awg, '%f'), 'ESIG');
+                    end
+                end
+            case 'err'
+                for a=1:length(awgdata)
+                  fprintf('%d: %s\n',a,query(awgdata(a).awg, 'SYST:ERR?'));
+                end
+                
+            case 'clr'
+                for a=1:length(awgdata)
+                    i = 0;
+                    err2 = sprintf('n/a.\n');
+                    while 1
+                        err = query(awgdata(a).awg, 'SYST:ERR?');
+                        if strcmp(err(1:end-1), '0,"No error"')
+                            fprintf('%d: %i errors. Last %s', a, i, err2);
+                            break;
+                        end
+                        err2 = err;
+                        i = i + 1;
+                    end
+                end
+        end
+    end
 end
 
-breaks = [regexp(cntrl, '\<\w'); regexp(cntrl, '\w\>')];
-
-for k = 1:size(breaks, 2);
-    switch cntrl(breaks(1, k):breaks(2, k))
-        case 'stop'
-            fprintf(awgdata.awg, 'AWGC:STOP');
-            
-        case 'start'
-            fprintf(awgdata.awg, 'AWGC:RUN');
-            awgcntrl('wait');
-            
-        case 'off'
-            for i = chans
-                fprintf(awgdata.awg, 'OUTPUT%i:STAT 0', i);
-            end
-            
-        case 'on'
-            for i = chans
-                fprintf(awgdata.awg, 'OUTPUT%i:STAT 1', i);
-            end
-            
-        case 'wait'
-            to = awgdata.awg.timeout;
-            awgdata.awg.timeout = 600;
-            query(awgdata.awg, '*OPC?');
-            awgdata.awg.timeout = to;
-            
-        case 'raw'
-            %awgcntrl('stop');
-            %awgcntrl('off');
-            if any(~awgcntrl('israw'))            
-              for i = chans
-                  fprintf(awgdata.awg, 'AWGC:DOUT%i:STAT 1', i);
-              end
-            else
-              fprintf('Already raw\n');
-            end
-            %awgcntrl('on');
-            %awgcntrl('start');
-            
-        case 'amp'
-            %awgcntrl('stop');
-            %awgcntrl('off');
-            if any(awgcntrl('israw'))
-              for i = chans
-                 fprintf(awgdata.awg, 'AWGC:DOUT%i:STAT 0', i);
-              end
-            else
-              fprintf('Already amp\n');
-            end
-            
-            %awgcntrl('on');
-            %awgcntrl('start');
-            
-        case 'israw'
-            for i = chans
-                %fprintf('%s',query(awgdata.awg, 'AWGC:DOUT%i:STAT?',i));
-                fprintf(awgdata.awg, 'AWGC:DOUT%i:STAT?',i);
-                val(i) = fscanf(awgdata.awg,'%f');
-            end
-            
-        case 'exton'    %adds external DC to outputs specified in chans
-            %awgcntrl('stop');
-            %awgcntrl('off');
-            for i = chans
-                fprintf(awgdata.awg, 'SOUR%i:COMB:FEED "ESIG"', i);
-            end
-            %awgcntrl('on');
-            %awgcntrl('start');
-            
-        case 'extoff'   %turns off external DC
-            %awgcntrl('stop');
-            %awgcntrl('off');
-            for i = chans
-                fprintf(awgdata.awg, 'SOUR%i:COMB:FEED ""', i);
-            end
-            %awgcntrl('on');
-            %awgcntrl('start');
-            
-        case 'isexton'
-            for i = chans
-                fprintf(awgdata.awg, 'SOUR%i:COMB:FEED?',i);
-                val(i) = strcmp(fscanf(awgdata.awg, '%f'), 'ESIG');
-            end
-            
-        case 'err'
-            fprintf(query(awgdata.awg, 'SYST:ERR?'));
-            
-        case 'clr'
-            i = 0;
-            err2 = sprintf('n/a.\n');
-            while 1
-                err = query(awgdata.awg, 'SYST:ERR?');
-                if strcmp(err(1:end-1), '0,"No error"')
-                    fprintf('%i errors. Last %s', i, err2);
-                    return;
-                end
-                err2 = err;
-                i = i + 1;
-            end
-    end
+function chans=ch(awg, chans)
+  if isempty(chans)
+      chans=1:length(awg.chans);
+  end
 end

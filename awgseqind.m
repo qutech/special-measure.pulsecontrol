@@ -17,24 +17,24 @@ end
 seqind = nan(1, length(pulses));
 for i = 1:length(pulses)
      if iscell(pulses) % could allow ints as well
-         ind = strmatch(pulses{i}, {awgdata.pulsegroups.name}, 'exact');
+         ind = strmatch(pulses{i}, {awgdata(1).pulsegroups.name}, 'exact');
          if isempty(ind) % no such group
               seqind(i) = nan;
          else
-             seqind(i) = awgdata.pulsegroups(ind).seqind;
+             seqind(i) = awgdata(1).pulsegroups(ind).seqind;
          end
      elseif pulses(i) > 0
          if(exist('rep', 'var'))
-             ind = find(pulses(i) == awgdata.seqpulses);
+             ind = find(pulses(i) == awgdata(1).seqpulses);
              ind=ind(rep(i));
          else
-             ind = find(pulses(i) == awgdata.seqpulses, 1);
+             ind = find(pulses(i) == awgdata(1).seqpulses, 1);
          end
          if ~isempty(ind)
              seqind(i) = ind;
          end
      else
-         seqind(i) = awgdata.pulsegroups(-pulses(i)).seqind;
+         seqind(i) = awgdata(1).pulsegroups(-pulses(i)).seqind;
      end
 end
 if any(isnan(seqind))

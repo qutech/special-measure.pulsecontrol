@@ -7,10 +7,14 @@ function awgnpulse(groups, npulse)
 
 global awgdata;
 groups = awggrpind(groups);
+
+for a=1:length(awgdata)
     
-for i = 1:length(groups)
-    pd.name = awgdata.pulsegrous(groups(i)).name;
-    pg.npulse = npulse(min(i, end));    
-    pulseupdate(pg);
-    awgadd(groups(i));
+    for i = 1:length(groups)
+        pg.name = awgdata(a).pulsegrous(groups(i)).name;
+        pg.npulse = npulse(min(i, end));
+        pulseupdate(pg);
+        awgadd(groups(i));
+    end
+    
 end

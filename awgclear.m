@@ -11,7 +11,7 @@ global awgdata;
 global plsdata;
 
 if strcmp(groups, 'pack')
-   grps={awgdata.pulsegroups.name};
+   grps={awgdata(1).pulsegroups.name};
    awgrm(1,'after');
    awgrm(1);
    awgclear('all');
@@ -20,7 +20,9 @@ if strcmp(groups, 'pack')
 end
 if strcmp(groups, 'all')
 %    groups = query(awgdata.awg, 'WLIS:SIZE?', '%s\n', '%i')-1:-1:1;
-    fprintf(awgdata.awg,'WLIS:WAV:DEL ALL\n')
+    for a=1:length(awgdata)
+      fprintf(awgdata(a).awg,'WLIS:WAV:DEL ALL\n')
+    end
     logentry('Cleared all pulses.');
     % Mark all pulse groups as not loaded
     g=plsinfo('ls');
@@ -36,35 +38,39 @@ if strcmp(groups, 'all')
     end
     return;
 end
-    
+
 
 if ischar(groups)
     groups = {groups};
 end
 tic;
-if isreal(groups)    
-    groups = sort(groups, 'descend');    
-    for i = groups
-        wf = query(awgdata.awg, sprintf('WLIS:NAME? %d', i));
-        if ~query(awgdata.awg, sprintf('WLIS:WAV:PRED? %s', wf), '%s\n', '%i')
-            fprintf(awgdata.awg, 'WLIS:WAV:DEL %s', wf);
-            awgcntrl('wait');
+for a=1:length(awgdata)
+    if isreal(groups)
+        groups = sort(groups, 'descend');
+        for i = groups
+            wf = query(awgdata(a).awg, sprintf('WLIS:NAME? %d', i));
+            if ~query(awgdata(a).awg, sprintf('WLIS:WAV:PRED? %s', wf), '%s\n', '%i')
+                fprintf(awgdata(a).awg, 'WLIS:WAV:DEL %s', wf);                
+            end
+            if toc > 20
+                fprintf('%i/%i\n', i, length(groups));
+                tic;
+            end
         end
-        if toc > 20
-            fprintf('%i/%i\n', i, length(groups));
-            tic;
-        end
+        return;
     end
-    return;
+    awgcntrl('wait');
 end
-    
+
 for k = 1:length(groups)
     load([plsdata.grpdir, 'pg_', groups{k}], 'zerolen', 'plslog');
     awgrm(groups{k});
     
     for i = 1:size(zerolen, 1)
         for j = find(zerolen(i, :) < 0)
-            fprintf(awgdata.awg, sprintf('WLIS:WAV:DEL "%s_%05d_%d"', groups{k}, i, j));
+            for a=1:length(awgdata)
+              fprintf(awgdata(a).awg, sprintf('WLIS:WAV:DEL "%s_%05d_%d"', groups{k}, i, j));
+            end
         end
     end
     plslog(end).time(end+1) = -now;

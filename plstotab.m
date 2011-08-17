@@ -55,6 +55,7 @@ pulse = plsdefault(pulse);
 %     pulse = plsdata.pulses(pulse.data);
 % end
         
+dt=-1e-9;  % Shortest meaninful length
 
 switch pulse.format
     case 'tab'
@@ -87,7 +88,7 @@ switch pulse.format
                     fillmarkpos = size(marktab,2);                    
                 case 'wait'
                     if pulsedef(i).time(1) > 1e-11
-                        pulsetab(1, end+(1:2)) = pulsetab(1, end) + [1e-3, pulsedef(i).time(1)]; %pinf.tbase*1e6/pinf.clk.
+                        pulsetab(1, end+(1:2)) = pulsetab(1, end) + [dt, pulsedef(i).time(1)]; %pinf.tbase*1e6/pinf.clk.
                         if length(pulsedef(i).val) > 2
                           pulsetab(2:3, end+(-1:0)) = repmat(pulsedef(i).val(3)*pulsedef(i).val(1:2)', 1, 2);
                         else
@@ -107,7 +108,7 @@ switch pulse.format
                       fillpos = fillpos + fillload;                    
                     end
                 case 'meas_o' % offset measurement
-                    pulsetab(1, end+(1:2)) = pulsetab(1, end) + [1e-3, pulsedef(i).time(1)]; %pinf.tbase*1e6/pinf.clk.
+                    pulsetab(1, end+(1:2)) = pulsetab(1, end) + [dt, pulsedef(i).time(1)]; %pinf.tbase*1e6/pinf.clk.
                     pulsetab(2:3, end-1) = pulsetab(2:3,end-2);
                     pulsetab(2:3, end) = pulsetab(2:3,end-2);
                     marktab(:, end+1) = [pulsetab(1, end-2)+pulsedef(i).time(2); 0; 0; 0; pulsedef(i).time(1:3)*[1; -1; -1]];
@@ -122,7 +123,7 @@ switch pulse.format
                     else
                         mpnt = [0,0];
                     end
-                    pulsetab(1, end+(1:2)) = pulsetab(1, end) + [1e-3, pulsedef(i).time(1)]; %pinf.tbase*1e6/pinf.clk.
+                    pulsetab(1, end+(1:2)) = pulsetab(1, end) + [dt, pulsedef(i).time(1)]; %pinf.tbase*1e6/pinf.clk.
                     pulsetab(2:3, end-1) = mpnt;
                     pulsetab(2:3, end) = mpnt;
                     marktab(:, end+1) = [pulsetab(1, end-2)+pulsedef(i).time(2); 0; 0; 0; pulsedef(i).time(1:3)*[1; -1; -1]];
@@ -155,7 +156,7 @@ switch pulse.format
 
                 case 'adprep'
                     if pulsedef(i).time(1) > 1e-11
-                        pulsetab(1, end+(1:2)) = pulsetab(1, end) + [1e-3, pulsedef(i).time(1)];
+                        pulsetab(1, end+(1:2)) = pulsetab(1, end) + [dt, pulsedef(i).time(1)];
                         if(length(pulsedef(i).val) <= 2)
                             dir=[-1 1];
                         else
@@ -166,7 +167,7 @@ switch pulse.format
                     end
                 case 'adread'
                     if pulsedef(i).time(1) > 1e-11
-                        pulsetab(1, end+(1:2)) = pulsetab(1, end) + [1e-3, pulsedef(i).time(1)];
+                        pulsetab(1, end+(1:2)) = pulsetab(1, end) + [dt, pulsedef(i).time(1)];
                         if(length(pulsedef(i).val) <= 2)
                             dir=[-1 1];
                         else
