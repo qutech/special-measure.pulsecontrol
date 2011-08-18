@@ -122,9 +122,15 @@ end
 
 if plschng % pulses changed
     lastupdate = now;
+    save(file, '-append', 'grpdef', 'lastupdate');
+    logentry('Updated group %s.', grpdef.name);
+    ind = awggrpind(grpdef.name);
+    
+    if ~isnan(ind)
+        awgdata.pulsegroups(ind).lastupdate=now;
+    end
+else
+    fprintf('Didn''t update group "%s": nothing changed\n',grpdef.name);
 end
 
-save(file, '-append', 'grpdef', 'lastupdate');
-
-logentry('Updated group %s.', grpdef.name);
 %fprintf('Updated group %s.\n', grpdef.name);

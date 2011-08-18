@@ -90,44 +90,52 @@ switch ctrl
         end
         
     case 'ro'
-        warning('off', 'MATLAB:load:variableNotFound');
-        load([plsdata.grpdir, 'pg_', group], 'grpdef', 'zerolen','plslog');
-        warning('on', 'MATLAB:load:variableNotFound');  
-        if isfield(plslog(end),'readout')
-            val=plslog(end).readout;            
-        elseif strfind(grpdef.ctrl,'grp')
-            val=[];
-            for l=1:length(grpdef.pulses.groups)
-                val=[val ; plsinfo('ro',grpdef.pulses.groups{l})];
-                [u i]=unique(val(:,1));
-                val=val(i,:);
-            end            
-        else            
-            if exist('zerolen','var') && size(zerolen,1) > 1
-              pd = plsmakegrp(group,'',[1 size(zerolen,1)]) ; % minor bug; assume all pulses have same readout.                        
-              val = [pd.pulses(1).data.readout ; pd.pulses(2).data.readout];            
-              if any(abs(diff(val,[],1)) > 1e-10)
-                  warning('Readout changes between pulses in %s\n',group);
-              end
-              val=val(1,:);
+        ind=awggrpind(group);
+        if ~isnan(ind) && isfield(awgdata.pulsegroups(ind),'readout') && ~isempty(awgdata.pulsegroups(ind).readout)
+            val=awgdata.pulsegroups(ind).readout;
+        else
+            warning('off', 'MATLAB:load:variableNotFound');
+            load([plsdata.grpdir, 'pg_', group], 'grpdef', 'zerolen','plslog');
+            warning('on', 'MATLAB:load:variableNotFound');
+            if isfield(plslog(end),'readout')
+                val=plslog(end).readout;
+            elseif strfind(grpdef.ctrl,'grp')
+                val=[];
+                for l=1:length(grpdef.pulses.groups)
+                    val=[val ; plsinfo('ro',grpdef.pulses.groups{l})];
+                    [u i]=unique(val(:,1));
+                    val=val(i,:);
+                end
             else
-              pd = plsmakegrp(group,'',1) ; % minor bug; assume all pulses have same readout.                        
-              val = pd.pulses.data(1).readout;                
+                if exist('zerolen','var') && size(zerolen,1) > 1
+                    pd = plsmakegrp(group,'',[1 size(zerolen,1)]) ; % minor bug; assume all pulses have same readout.
+                    val = [pd.pulses(1).data.readout ; pd.pulses(2).data.readout];
+                    if any(abs(diff(val,[],1)) > 1e-10)
+                        warning('Readout changes between pulses in %s\n',group);
+                    end
+                    val=val(1,:);
+                else
+                    pd = plsmakegrp(group,'',1) ; % minor bug; assume all pulses have same readout.
+                    val = pd.pulses.data(1).readout;
+                end
             end
-            
         end
     case 'zl'
-        warning('off', 'MATLAB:load:variableNotFound');
-        load([plsdata.grpdir, 'pg_', group], 'zerolen');
-        warning('on', 'MATLAB:load:variableNotFound');       
-        
-        if ~exist('zerolen', 'var')
-            load([plsdata.grpdir, 'pg_', group], 'grpdef');
-            load([plsdata.grpdir, 'pg_', grpdef.pulses.groups{1}], 'zerolen');
-        end % hack as a dirty bug fix. Size of zerolen does not match group format.
-        % would have to read and merge all component groups.
-        val = zerolen;
-        
+        ind=awggrpind(group);
+        if ~isnan(ind) && isfield(awgdata.pulsegroups(ind),'zerolen') && ~isempty(awgdata.pulsegroups(ind).zerolen)
+            val=awgdata.pulsegroups(ind).zerolen;
+        else
+            warning('off', 'MATLAB:load:variableNotFound');
+            load([plsdata.grpdir, 'pg_', group], 'zerolen');
+            warning('on', 'MATLAB:load:variableNotFound');
+            
+            if ~exist('zerolen', 'var')
+                load([plsdata.grpdir, 'pg_', group], 'grpdef');
+                load([plsdata.grpdir, 'pg_', grpdef.pulses.groups{1}], 'zerolen');
+            end % hack as a dirty bug fix. Size of zerolen does not match group format.
+            % would have to read and merge all component groups.
+            val = zerolen;
+        end
     case 'gd'
         load([plsdata.grpdir, 'pg_', group], 'grpdef');
         val = grpdef;
@@ -138,18 +146,24 @@ switch ctrl
         if(~isempty(time))
            val=val(logentry(val,time)); 
         end
-    case 'stale'
-        load([plsdata.grpdir, 'pg_', group], 'lastupdate','plslog','grpdef');
-        if(isempty(strfind(grpdef.ctrl,'seq')))
-          val = lastupdate > plslog(end).time(end);
-          if val && nargout == 0
-              fprintf('Pulse group ''%s'' is stale.\n',group);
-          end   
+    case 'stale'        
+        ind=awggrpind(group);
+        if ~isnan(ind) && isfield(awgdata.pulsegroups(ind),'lastupdate') && isfield(awgdata.pulsegroups(ind),'lastload') && ...
+                ~isempty(awgdata.pulsegroups(ind).lastupdate) && ~isempty(awgdata.pulsegroups(ind).lastload)
+            val = awgdata.pulsegroups(ind).lastload < awgdata.pulsegroups(ind).lastupdate;
         else
-          val = 0;
-          for i=1:length(grpdef.pulses.groups)
-            val = val || plsinfo('stale',grpdef.pulses.groups{i});   
-          end
+            load([plsdata.grpdir, 'pg_', group], 'lastupdate','plslog','grpdef');
+            if(isempty(strfind(grpdef.ctrl,'seq')))
+                val = lastupdate > plslog(end).time(end);
+                if val && nargout == 0
+                    fprintf('Pulse group ''%s'' is stale.\n',group);
+                end
+            else
+                val = 0;
+                for i=1:length(grpdef.pulses.groups)
+                    val = val || plsinfo('stale',grpdef.pulses.groups{i});
+                end
+            end
         end
         
     case 'sl'

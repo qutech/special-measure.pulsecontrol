@@ -91,7 +91,7 @@ for k = 1:length(groups)
         gind = length(awgdata.pulsegroups)+1;
         awgdata.pulsegroups(gind).name = grpdef.name;
         awgdata.pulsegroups(gind).seqind = startline;        
-        
+        awgdata.pulsegroups(gind).lastupdate = lastupdate;
         awgdata.pulsegroups(gind).npulse = [npls usetrig];
         if strfind(grpdef.ctrl,'pack')
             awgdata.pulsegroups(gind).nline = 1+usetrig;
@@ -113,7 +113,10 @@ for k = 1:length(groups)
         else
             zlmult=1;
         end
-        if any(awgdata.pulsegroups(gind).nrep ~= grpdef.nrep) % nrep changed
+        
+        if any(awgdata.pulsegroups(gind).nrep ~= grpdef.nrep) || ...
+           any(any(awgdata.pulsegroups(gind).readout ~= plslog(end).readout)) || ...
+           any(any(awgdata.pulsegroups(gind).zerolen ~= zerolen)) % nrep changed
           dosave = 1;
         end
     end
@@ -128,6 +131,9 @@ for k = 1:length(groups)
     
 
     awgdata.pulsegroups(gind).nrep = grpdef.nrep;
+    awgdata.pulsegroups(gind).lastload = plslog(end).time(1);
+    awgdata.pulsegroups(gind).zerolen = zerolen;  % Cache some handy stuff here.
+    awgdata.pulsegroups(gind).readout=plslog(end).readout;
     
     if usetrig
         fprintf(awgdata.awg, sprintf('SEQ:ELEM%d:WAV1 "trig_%08d"', startline, awgdata.triglen));

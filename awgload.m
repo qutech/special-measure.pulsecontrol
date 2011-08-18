@@ -71,6 +71,12 @@ for i = 1:length(grp.pulses)
 end
 awgcntrl('clr');
 
+% if the pulse group is added, update it's load time.
+ind=awggrpind(grp.name);
+if ~isnan(ind)
+    awgdata.pulsegroups(ind).lastload=now;
+end
+
 if dosave
     awgsavedata;
 end
