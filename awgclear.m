@@ -22,9 +22,11 @@ if strcmp(groups, 'all')
 %    groups = query(awgdata.awg, 'WLIS:SIZE?', '%s\n', '%i')-1:-1:1;
     fprintf(awgdata.awg,'WLIS:WAV:DEL ALL\n')
     logentry('Cleared all pulses.');
-    % Mark all pulse groups as not loaded
-    if 1
+    
+    if 0  % Mark all pulse groups as not loaded
         g=plsinfo('ls');
+    else  % Mark only groups known to be loaded as loaded.
+        g={awgdata.pulsegroups.name};
     end
     for i=1:length(g)
        load([plsdata.grpdir, 'pg_', g{i}, '.mat'], 'plslog');       
