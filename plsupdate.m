@@ -112,10 +112,12 @@ end
 %end
 
 if isfield(newdef, 'nrep')
+    plschng = 1;
     grpdef.nrep = newdef.nrep;
 end
 
 if isfield(newdef, 'jump')
+    plschng = 1;
     grpdef.jump = newdef.jump;
 end
 
