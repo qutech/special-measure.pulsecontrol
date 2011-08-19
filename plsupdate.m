@@ -11,6 +11,7 @@ function plsupdate(newdef)
 % Not implmented: Missing or nan entries of params are taken from previous values.
 
 global plsdata;
+global awgdata;
 
 if length(newdef) > 1
     if iscell(newdef)
@@ -128,7 +129,7 @@ if plschng % pulses changed
     logentry('Updated group %s.', grpdef.name);
     ind = awggrpind(grpdef.name);
     
-    if ~isnan(ind)
+    if ~isnan(ind)   
         awgdata.pulsegroups(ind).lastupdate=now;
     end
 else
