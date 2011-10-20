@@ -1,33 +1,37 @@
-function awgclear(groups)
+function awgclear(groups,options)
 % awgclear(groups)
 %    OR
 % awgclear('all')
 % awgclear('pack') removes all groups, adds back groups loaded in sequences
+% awgclear('all','paranoid') removes all waveforms, including those not known to be loaded.
+% awgclear('pack','paranoid') similar
 
 % (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
 
-
+if ~exist('options','var')
+    options='';
+end
 global awgdata;
 global plsdata;
 
 if strcmp(groups, 'pack')
    grps={awgdata.pulsegroups.name};
-   awgclear('all');
+   awgclear('all',options);
    awgrm(1,'after');
    awgrm(1);   
    awgadd(grps);
    return;
 end
-if strcmp(groups, 'all')
-%    groups = query(awgdata.awg, 'WLIS:SIZE?', '%s\n', '%i')-1:-1:1;
+
+if strcmp(groups, 'all') 
+          % Mark only groups known to be loaded as loaded.
+    if isempty(strfind(options,'paranoid'))
+       g=awgwaveforms;            
+    else  % Mark all pulse groups as not loaded
+       g=plsinfo('ls');
+    end
     fprintf(awgdata.awg,'WLIS:WAV:DEL ALL\n')
     logentry('Cleared all pulses.');
-    
-    if 0  % Mark all pulse groups as not loaded
-        g=plsinfo('ls');
-    else  % Mark only groups known to be loaded as loaded.
-        g={awgdata.pulsegroups.name};        
-    end
     for i=1:length(g)        
        load([plsdata.grpdir, 'pg_', g{i}, '.mat'], 'plslog');       
        if(plslog(end).time(end) <= 0)
@@ -38,9 +42,17 @@ if strcmp(groups, 'all')
           fprintf('Marking group ''%s'' as unloaded\n',g{i});
        end
     end
-    return;
+    return;       
 end
     
+if strcmp(groups,'unused')
+    g=awgwaveforms;
+    g2={awgdata.pulsegroups.name};
+    groups=setdiff(g,g2);
+    for i=1:length(groups)
+      fprintf('Unloading %s\n',groups{i});
+    end
+end
 
 if ischar(groups)
     groups = {groups};
@@ -65,6 +77,7 @@ end
 for k = 1:length(groups)
     load([plsdata.grpdir, 'pg_', groups{k}], 'zerolen', 'plslog');
     awgrm(groups{k});
+    
     
     for i = 1:size(zerolen, 1)
         for j = find(zerolen(i, :) < 0)
