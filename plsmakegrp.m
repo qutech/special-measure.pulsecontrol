@@ -43,7 +43,7 @@ for k = 1:length(name)
         fprintf('Group %s has %d log entries.\n',name{k},length(plslog));
     end
     if exist('plslog','var')  && ~isempty(plslog) && ~isempty(opts.time)
-        le=plslog_logentry(plslog,opts.time);                 
+        le=plsinfo_logentry(plslog,opts.time);                 
         grpdef.params=plslog(le).params;
         grpdef.matrix=plslog(le).matrix;
         grpdef.varpar=plslog(le).varpar;
@@ -173,7 +173,7 @@ for k = 1:length(name)
             
             
             for j = 1:length(groupdef.groups)
-                pg = plsmakegrp(groupdef.groups{j});
+                pg = plsmakegrp(groupdef.groups{j},'upload local');
                 
                 if ~isfield(pg, 'pulseind') %|| some flag set to apply pulseind after adding, same for all groups
                     pg.pulseind = 1:length(pg.pulses);
@@ -209,7 +209,7 @@ for k = 1:length(name)
                 
                 %ind not given to recursive call above, so plsmagegrp makes all pulses, specified by pulseind or default
                 % of source group. Need to reconstruct indices as used for file names by inverting unique
-                [pind, pind, pind] = unique(pg.pulseind);
+                [pind, pind, pind] = unique(pg.pulseind(min(j,end),:));
                 
                 for i = 1:length(pg.pulseind)
                     if j == 1 % first pf determines size
@@ -221,6 +221,7 @@ for k = 1:length(name)
                         for ii=1:size(pg.pulses(pind(i)).data.readout,1)                            
                             roi=find(grpdef.pulses(pind(i)).data.readout(:,1) == pg.pulses(pind(i)).data.readout(ii,1));
                             if ~isempty(roi)
+                                fprintf('Overwriting readout window\n');
                                 grpdef.pulses(pind(i)).data.readout(roi(1),2:3) = pg.pulses(pind(i)).data.readout(ii,2:3);
                             else
                                 grpdef.pulses(pind(i)).data.readout(end+1,:) = pg.pulses(pind(i)).data.readout(ii,1:3);
@@ -314,8 +315,8 @@ for k = 1:length(name)
                 if length(awgdata.scale) == 1 
                     over = any(abs(grpdef.pulses(i).data.wf(:)) > awgdata.scale);
                 else
-                  for l=1:length(awgdata.scale)
-                      over = over || any(abs(grpdef.pulses(i).data.wf(l,:)) > awgdata.scale);
+                  for l=1:min(length(awgdata.scale),size(grpdef.pulses(i).data.wf,1))
+                      over = over || any(abs(grpdef.pulses(i).data.wf(l,:)) > awgdata.scale(l));
                   end                  
                 end
                 if over
