@@ -11,12 +11,18 @@ if ischar(grp)
     grp = {grp};
 end
 
+if ~isfield(awgdata(1).pulsegroups,'name')
+    names={};
+else
+    names={awgdata(1).pulsegroups.name};
+end
+
 if iscell(grp)   
-    for i = 1:length(grp)
-        grp{i} = max(strmatch(grp{i}, {awgdata(1).pulsegroups.name}, 'exact'));
+    for i = 1:length(grp) 
+        grp{i} = max(strmatch(grp{i}, names, 'exact'));
         if isempty(grp{i})
             grp{i} = nan;
-            fprintf('Group not loaded.\n');
+            %fprintf('Group not loaded.\n');
             %error('Group not loaded.');
         end           
     end

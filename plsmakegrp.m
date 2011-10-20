@@ -39,6 +39,9 @@ for k = 1:length(name)
        grpdef=name{k};
     end
     
+    if exist('plslog','var')  && length(plslog) > 100
+        fprintf('Group %s has %d log entries.\n',name{k},length(plslog));
+    end
     if exist('plslog','var')  && ~isempty(plslog) && ~isempty(opts.time)
         le=plslog_logentry(plslog,opts.time);                 
         grpdef.params=plslog(le).params;
@@ -382,7 +385,7 @@ for k = 1:length(name)
                 plslog(end).xval = vertcat(grpdef.pulses.xval)'; % temporary bug fix
                 plslog(end).ind = ind;
                 
-                save([plsdata.grpdir, 'pg_', name{k}], '-append', 'plslog', 'zerolen');
+                save([plsdata.grpdir, 'pg_', name{k}], '-append','-v6', 'plslog', 'zerolen');
                 logentry('Uploaded group %s, revisions %i.', grpdef.name, length(plslog));
               %  fprintf(' in upload of group %s.\n', grpdef.name);
             else
@@ -391,8 +394,6 @@ for k = 1:length(name)
 
     end
 end
-
-
 
 % Apply a default.
 function s=def(s,f,v)

@@ -12,9 +12,9 @@ global plsdata;
 
 if strcmp(groups, 'pack')
    grps={awgdata(1).pulsegroups.name};
-   awgrm(1,'after');
-   awgrm(1);
    awgclear('all');
+   awgrm(1,'after');
+   awgrm(1);   
    awgadd(grps);
    return;
 end
@@ -24,18 +24,20 @@ if strcmp(groups, 'all')
       fprintf(awgdata(a).awg,'WLIS:WAV:DEL ALL\n')
     end
     logentry('Cleared all pulses.');
-    % Mark all pulse groups as not loaded
-    if 1
+    
+    if 0  % Mark all pulse groups as not loaded
         g=plsinfo('ls');
+    else  % Mark only groups known to be loaded as loaded.
+        g={awgdata.pulsegroups.name};        
     end
-    for i=1:length(g)
+    for i=1:length(g)        
        load([plsdata.grpdir, 'pg_', g{i}, '.mat'], 'plslog');       
        if(plslog(end).time(end) <= 0)
-          %fprintf('Skipping group ''%s''; already unloaded\n',g{i});
+          fprintf('Skipping group ''%s''; already unloaded\n',g{i});
        else          
           plslog(end).time(end+1) = -now;
           save([plsdata.grpdir, 'pg_', g{i}, '.mat'], 'plslog','-append');
-%          fprintf('Marking group ''%s'' as unloaded\n',g{i});
+          fprintf('Marking group ''%s'' as unloaded\n',g{i});
        end
     end
     return;
@@ -78,5 +80,5 @@ for k = 1:length(groups)
     plslog(end).time(end+1) = -now;
     save([plsdata.grpdir, 'pg_', groups{k}], '-append', 'plslog');
     logentry('Cleared group %s.', groups{k});
-    fprintf('Cleared group %s.', groups{k});
+    fprintf('Cleared group %s.\n', groups{k});
 end
