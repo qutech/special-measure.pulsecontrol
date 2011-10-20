@@ -108,10 +108,15 @@ chunksize=65536;
 if(size(data,1) > size(data,2))
     data=data';
 end
-    ch=chan;    
-    bits=14;  % Note that tektronix aligns all waveform data so this is correct.
-      %awgdata.bits is only useful for predicting quantization.
-    data = uint16(min(((awgdata(a).offset(min(ch,end)) + data)./awgdata(a).scale(min(ch,end)) + 1)*2^(bits-1) - 1, 2^(bits)-1)) + uint16(marker) * 2^(bits);
+    data=(awgdata(a).offset(min(chan,end)) + data)./awgdata(a).scale(chan) + 1;
+    tb=find(data > 2);
+    tl=find(data < 0);
+    if ~isempty(tb) || ~isempty(tl)
+      %  fprintf('Pulse exceeds allowed range: %g - %g\n',min(data),max(data));
+        data(tb) = 2;
+        data(tl) = 0;
+    end
+    data = uint16(min(data*(2^(awgdata(a).bits-1) - 1), 2^(awgdata(a).bits)-1)) + uint16(marker) * 2^(awgdata(a).bits);
     npts = length(data);
     for os=0:chunksize:npts
         if os + chunksize >= npts

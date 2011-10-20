@@ -122,6 +122,19 @@ if isfield(newdef, 'jump')
     grpdef.jump = newdef.jump;
 end
 
+% may be buggy below.
+if isfield(newdef,'pulses')
+    if isnumeric(newdef.pulses) && any(newdef.pulses ~= grpdef.pulses)
+        error('plsupdate cannot change pulse numbers');
+    elseif isfield(newdef.pulses,'groups')
+        for i=1:length(newdef.pulses.groups)
+            if ~strcmp(newdef.pulses.groups{i},grpdef.pulses.groups{i})
+                error('plsupdate cannot change inner pulse groups');
+            end
+        end
+    end
+end
+    
 
 if plschng % pulses changed
     lastupdate = now;
@@ -136,4 +149,4 @@ else
     fprintf('Didn''t update group "%s": nothing changed\n',grpdef.name);
 end
 
-%fprintf('Updated group %s.\n', grpdef.name);
+fprintf('Updated group %s.\n', grpdef.name);

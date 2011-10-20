@@ -38,6 +38,9 @@ switch ctrl
               val = val(ind, :);              
             end
         else
+            if ~isfield(plslog(le),'xval') % Fix for groups that have never been updated.
+                plslog(le).xval = grpdef.xval;
+            end
             if(isfield(grpdef,'pulseind'))
                 pis=unique(grpdef.pulseind);
                 for i=1:length(grpdef.pulseind)
@@ -80,7 +83,9 @@ switch ctrl
             if ~isempty(ind)
               val = val(:,ind);              
             end
-        else
+        elseif ~isfield(plslog(le),'params')
+          val = grpdef.params(ind,:);  
+        else    
           while(max(ind) > size(plslog(le).params,1))
               fprintf('Warning; not enough params on group %s.  Trying next log entry\n', ...
                    group);                    
