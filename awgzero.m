@@ -9,16 +9,12 @@ function zerolen = awgzero(grp, ind, zerolen)
 global awgdata;
 
 for i = 1:length(grp.pulses)
-    
-    data = uint16(min((grp.pulses(i).data.wf./awgdata.scale + 1)*2^13 - 1, 2^14-1)) + uint16(grp.pulses(i).data.marker) * 2^14;
-    npts = size(data, 2);
-
-    for j = 1:size(data, 1)
-        % optionally catenate pulses and write outside main loop.
-        if ~all(data(j, :) == 2^13-1)
-            zerolen(ind(i), j) = -npts;
+    npts=size(grp.pulses(i).data.wf,2);
+    for j = 1:size(grp.pulses(i).data.wf, 1)        
+        if any(abs(grp.pulses(i).data.wf(j, :)) > awgdata.scale(j)/(2^14)) || any(grp.pulses(i).data.marker(j,:) ~= 0)
+            zerolen(ind(i),j) = -npts;
         else
-            zerolen(ind(i), j) = npts;
+            zerolen(ind(i),j) = npts;
         end
     end
 end
