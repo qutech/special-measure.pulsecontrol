@@ -96,7 +96,15 @@ chunksize=65536;
 if(size(data,1) > size(data,2))
     data=data';
 end
-    data = uint16(min(((awgdata.offset(min(chan,end)) + data)./awgdata.scale(chan) + 1)*2^(awgdata.bits-1) - 1, 2^(awgdata.bits)-1)) + uint16(marker) * 2^(awgdata.bits);
+    data=(awgdata.offset(min(chan,end)) + data)./awgdata.scale(chan) + 1;
+    tb=find(data > 2);
+    tl=find(data < 0);
+    if ~isempty(tb) || ~isempty(tl)
+      %  fprintf('Pulse exceeds allowed range: %g - %g\n',min(data),max(data));
+        data(tb) = 2;
+        data(tl) = 0;
+    end
+    data = uint16(min(data*(2^(awgdata.bits-1) - 1), 2^(awgdata.bits)-1)) + uint16(marker) * 2^(awgdata.bits);
     npts = length(data);
     
     for os=0:chunksize:npts
