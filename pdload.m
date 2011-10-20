@@ -27,8 +27,7 @@ else
      times=cellfun(@(x) getfield(x,'time'),pd);
      i=find(times < opts,1,'last');     
      pd=pd{i};
-  end
-  end
+  end  
 end
     
 return

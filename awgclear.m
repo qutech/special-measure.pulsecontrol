@@ -28,7 +28,7 @@ if strcmp(groups, 'all')
     if 0  % Mark all pulse groups as not loaded
         g=plsinfo('ls');
     else  % Mark only groups known to be loaded as loaded.
-        g={awgdata.pulsegroups.name};        
+        g={awgdata(1).pulsegroups.name};        
     end
     for i=1:length(g)        
        load([plsdata.grpdir, 'pg_', g{i}, '.mat'], 'plslog');       

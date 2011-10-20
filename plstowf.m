@@ -148,7 +148,8 @@ for c=1:length(clk)
     pulse.data(c).elem=pulseinf.elem;
   end
   pulse.data(c).clk = clk(c);
-pulse.data.pulsetab = pulsetab;
-pulse.data.marktab = marktab;
+  pulse.data(c).pulsetab = pulsetab;
+  pulse.data(c).marktab = marktab;
+end
 pulse.format = 'wf';
 

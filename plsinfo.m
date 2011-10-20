@@ -122,8 +122,8 @@ switch ctrl
         end
     case 'zl'
         ind=awggrpind(group);
-        if ~isnan(ind) && isfield(awgdata.pulsegroups(ind),'zerolen') && ~isempty(awgdata.pulsegroups(ind).zerolen)
-            val=awgdata.pulsegroups(ind).zerolen;
+        if ~isnan(ind) && isfield(awgdata(1).pulsegroups(ind),'zerolen') && ~isempty(awgdata(1).pulsegroups(ind).zerolen)
+            val=awgdata(1).pulsegroups(ind).zerolen;
         else
             warning('off', 'MATLAB:load:variableNotFound');
             load([plsdata.grpdir, 'pg_', group], 'zerolen');
@@ -148,9 +148,9 @@ switch ctrl
         end
     case 'stale'        
         ind=awggrpind(group);
-        if ~isnan(ind) && isfield(awgdata.pulsegroups(ind),'lastupdate') && isfield(awgdata.pulsegroups(ind),'lastload') && ...
-                ~isempty(awgdata.pulsegroups(ind).lastupdate) && ~isempty(awgdata.pulsegroups(ind).lastload)
-            val = awgdata.pulsegroups(ind).lastload < awgdata.pulsegroups(ind).lastupdate;
+        if ~isnan(ind) && isfield(awgdata(1).pulsegroups(ind),'lastupdate') && isfield(awgdata(1).pulsegroups(ind),'lastload') && ...
+                ~isempty(awgdata(1).pulsegroups(ind).lastupdate) && ~isempty(awgdata(1).pulsegroups(ind).lastload)
+            val = awgdata(1).pulsegroups(ind).lastload < awgdata(1).pulsegroups(ind).lastupdate;
         else
             load([plsdata.grpdir, 'pg_', group], 'lastupdate','plslog','grpdef');
             if(isempty(strfind(grpdef.ctrl,'seq')))

@@ -129,9 +129,9 @@ for k = 1:length(groups)
         
         
         awgdata(a).pulsegroups(gind).nrep = grpdef.nrep;
-    awgdata.pulsegroups(gind).lastload = plslog(end).time(1);
-    awgdata.pulsegroups(gind).zerolen = zerolen;  % Cache some handy stuff here.
-    awgdata.pulsegroups(gind).readout=plslog(end).readout;
+    awgdata(a).pulsegroups(gind).lastload = plslog(end).time(1);
+    awgdata(a).pulsegroups(gind).zerolen = zerolen;  % Cache some handy stuff here.
+    awgdata(a).pulsegroups(gind).readout=plslog(end).readout;
         
         if usetrig
             fprintf(awgdata(a).awg, sprintf('SEQ:ELEM%d:WAV1 "trig_%08d"', startline, awgdata(a).triglen));
@@ -221,11 +221,17 @@ for k = 1:length(groups)
     wstart=toc;
     awgcntrl('wait');
     %fprintf('Wait time: %f secs; total time %f secs\n',toc-wstart,toc-astart);
-    err=query(awgdata.awg, 'SYST:ERR?');
-    if isempty(strfind(err, 'No error'))
-    fprintf('Added group %s on index %i. %s', grpdef.name, gind, err);
+    nerr=0;
+    for a=1:length(awgdata(a))
+      err=query(awgdata(a).awg, 'SYST:ERR?');    
+      if ~isempty(strfind(err, 'No error'))
+        nerr=nerr+1;
+      end
     end
-    logentry('Added group %s on index %i.', grpdef.name, gind);
+    if nerr == 0
+        fprintf('Added group %s on index %i. %s', grpdef.name, gind, err);      
+        logentry('Added group %s on index %i.', grpdef.name, gind);        
+    end
 end
 if dosave
     awgsavedata;

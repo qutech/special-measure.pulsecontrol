@@ -124,7 +124,7 @@ end
         fprintf(awgdata(a).awg,'');
     end
     time=(now-start)*24*60*60;
-    fprintf('Load time: %g seconds (%g bytes/sec)\n',time, npts*2/time);
+    %fprintf('Load time: %g seconds for %g points (%g bytes/sec)\n',time, npts,npts*2/time);
 end
 
 
