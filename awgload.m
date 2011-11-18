@@ -39,10 +39,9 @@ for a=1:length(awgdata)
         dosave = 1;
         awgdata(a).zeropls = awgdata(a).triglen;
     end
-    
+    nzpls=0;    
     for i = 1:length(grp.pulses)
-        npts = size(grp.pulses(i).data(dind).wf, 2);
-        
+        npts = size(grp.pulses(i).data(dind).wf, 2);        
         if ~any(awgdata(a).zeropls == npts) % create zero if not existing yet
             zdata=zeros(1,npts);
             for l=1:length(offsets)
@@ -53,13 +52,13 @@ for a=1:length(awgdata)
             awgdata(a).zeropls(end+1) = npts;
             dosave = 1;
         end
-        
+
         for j = 1:size(grp.pulses(i).data(dind).wf, 1)
             ch=find(grp.chan(j)==awgdata(a).chans);
             if isempty(ch)
                 continue;
             end
-            if any(abs(grp.pulses(i).data(dind).wf(j, :)) > awgdata(a).scale(ch)/(2^14)) || any(grp.pulses(i).data(dind).marker(j,:) ~= 0)
+            if any(abs(grp.pulses(i).data(dind).wf(j, :)) > awgdata(a).scale(ch)/(2^awgdata(a).bits)) || any(grp.pulses(i).data(dind).marker(j,:) ~= 0)
                 name = sprintf('%s_%05d_%d', grp.name, ind(i), j);
                 
                 if isempty(strmatch(name,awgdata(a).waveforms))
@@ -73,18 +72,31 @@ for a=1:length(awgdata)
                 end
                 awgloadwfm(a,grp.pulses(i).data(dind).wf(j,:), uint16(grp.pulses(i).data(dind).marker(j,:)), name, ch, 0);
                 zerolen{a}(ind(i), j) = -npts;
+                nzpls=1;
             else
                 zerolen{a}(ind(i), j) = npts;
             end
         end
     end
-awgcntrl('clr');
+    % If no non-zero pulses were loaded, make a dummy waveform so awgclear
+    % knows this group was in memory.
+    if nzpls == 0
+        name=sprintf('%s_1_1',grp.name);
+        npts=256;
+        if isempty(strmatch(name,awgdata(a).waveforms))
+            fprintf(awgdata(a).awg, sprintf('WLIS:WAV:NEW "%s",%d,INT', name, npts));
+            awgdata(a).waveforms{end+1}=name;
+        end
+        awgloadwfm(a,zeros(1,npts), zeros(1,npts), name, 1, 0);
+    end
 end
 
 % if the pulse group is added, update it's load time.
 ind=awggrpind(grp.name);
 if ~isnan(ind)
-    awgdata.pulsegroups(ind).lastload=now;
+    for i=1:length(awgdata)
+      awgdata(i).pulsegroups(ind).lastload=now;
+    end
 end
 
 if dosave
@@ -115,8 +127,8 @@ end
       %  fprintf('Pulse exceeds allowed range: %g - %g\n',min(data),max(data));
         data(tb) = 2;
         data(tl) = 0;
-    end
-    data = uint16(min(data*(2^(awgdata(a).bits-1) - 1), 2^(awgdata(a).bits)-1)) + uint16(marker) * 2^(awgdata(a).bits);
+    end % 14 bit data offset is hard-coded in the AWG.
+    data = uint16(min(data*(2^(14-1) - 1), 2^(14)-1)) + uint16(marker) * 2^14;
     npts = length(data);
     for os=0:chunksize:npts
         if os + chunksize >= npts

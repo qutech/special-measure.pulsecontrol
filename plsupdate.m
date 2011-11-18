@@ -142,8 +142,10 @@ if plschng % pulses changed
     logentry('Updated group %s.', grpdef.name);
     ind = awggrpind(grpdef.name);
     
-    if ~isnan(ind)   
-        awgdata.pulsegroups(ind).lastupdate=now;
+    if ~isnan(ind)  
+        for i=1:length(awgdata)
+          awgdata(i).pulsegroups(ind).lastupdate=now;
+        end
     end
 else
     fprintf('Didn''t update group "%s": nothing changed\n',grpdef.name);

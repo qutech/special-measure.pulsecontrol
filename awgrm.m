@@ -17,8 +17,8 @@ if strcmp(grp, 'all')
         fprintf(awgdata(a).awg, 'SEQ:LENG 0');
         awgdata(a).pulsegroups = [];
         awgdata(a).seqpulses = [];
-        awgsavedata;
     end
+    awgsavedata;
     return;
 end
 
@@ -32,7 +32,7 @@ awgcntrl('stop');
 
 if exist('ctrl','var') && strfind(ctrl, 'after')
     for a=1:length(awgdata)
-      fprintf(awgdata(a).awg, 'SEQ:LENG %d', awgdata(a).pulsegroups(grp).seqind-1 + sum(awgdata(a).pulsegroups(grp).npulse));
+      fprintf(awgdata(a).awg, 'SEQ:LENG %d', awgdata(a).pulsegroups(grp).seqind-1 + sum(awgdata(a).pulsegroups(grp).nline));
       awgdata(a).seqpulses(awgdata(a).pulsegroups(grp).seqind + sum(awgdata(a).pulsegroups(grp).npulse):end) = [];
       awgdata(a).pulsegroups(grp+1:end) = [];
     end

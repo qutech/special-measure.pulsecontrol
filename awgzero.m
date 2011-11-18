@@ -10,15 +10,13 @@ global awgdata;
 for awg=1:length(awgdata)
     scale=min(awgdata(awg).scale/2^(awgdata(awg).bits-1));
     for i = 1:length(grp.pulses)
-        dind = find([grp.pulses(i).data.clk == awgdata(awg).clk);
-        data = uint16(min((grp.pulses(i).data(dind).wf./awgdata(awg).scale + 1)*2^(awgdata(awg).bits-1) - 1, 2^awgdata(awg).bits-1)) + uint16(grp.pulses(i).data.marker) * 2^(awgdata(awg).bits);
-        npts = size(data, 2);
-        for j = 1:size(data, 1)
-            % optionally catenate pulses and write outside main loop.
-            if ~all(data(j, :) == 2^(awgdata(awg).bits-1)-1)
-                zerolen{awg}(ind(i), j) = -npts;
+        dind = find([grp.pulses(i).data.clk] == awgdata(awg).clk);
+        npts = size(grp.pulses(i).data(dind).wf, 2);
+        for j=1:size(grp.pulses(i).data(dind).wf,1) % FIXME; channel mappings not honored here.
+            if any(abs(grp.pulses(i).data(dind).wf(j,:) > awgdata(awg).scale(min(j,end))/(2^awgdata(awg).bits)))
+                zerolen{awg}(ind(i),j) = -npts;
             else
-                zerolen{awg}(ind(i), j) = npts;
+                zerolen{awg}(ind(i),j) = npts;
             end
         end
     end

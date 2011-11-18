@@ -96,8 +96,8 @@ switch ctrl
         
     case 'ro'
         ind=awggrpind(group);
-        if ~isnan(ind) && isfield(awgdata.pulsegroups(ind),'readout') && ~isempty(awgdata.pulsegroups(ind).readout)
-            val=awgdata.pulsegroups(ind).readout;
+        if ~isnan(ind) && isfield(awgdata(1).pulsegroups(ind),'readout') && ~isempty(awgdata(1).pulsegroups(ind).readout)
+            val=awgdata(1).pulsegroups(ind).readout;
         else
             warning('off', 'MATLAB:load:variableNotFound');
             load([plsdata.grpdir, 'pg_', group], 'grpdef', 'zerolen','plslog');
@@ -153,7 +153,9 @@ switch ctrl
         end
     case 'stale'        
         ind=awggrpind(group);
-        if ~isnan(ind) && isfield(awgdata(1).pulsegroups(ind),'lastupdate') && isfield(awgdata(1).pulsegroups(ind),'lastload') && ...
+        if isempty(awgwaveforms(group))
+            val=1;
+        elseif ~isnan(ind) && isfield(awgdata(1).pulsegroups(ind),'lastupdate') && isfield(awgdata(1).pulsegroups(ind),'lastload') && ...
                 ~isempty(awgdata(1).pulsegroups(ind).lastupdate) && ~isempty(awgdata(1).pulsegroups(ind).lastload)
             val = awgdata(1).pulsegroups(ind).lastload < awgdata(1).pulsegroups(ind).lastupdate;
         else

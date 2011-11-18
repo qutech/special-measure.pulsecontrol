@@ -17,6 +17,13 @@ function pulse = plstowf(pulse, dict)
 % name 
 % taurc (optional)
 % xval
+%
+% MARKTAB:
+%  each column gives a marker pulse
+%  [ start_time; ch1_mk1_wid ; ch1_mk2_wid ; ch_2_mk1_wid ...]
+%  ie,
+%  [ 2 ; 0 ; 1 ; 0 ; 1 ] fires markers ch1mk1 and ch2mk2 for 1 us starting at 2us.
+
 
 % (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
 

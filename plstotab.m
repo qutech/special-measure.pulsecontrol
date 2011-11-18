@@ -40,6 +40,12 @@ function pulse = plstotab(pulse)
 %       implemented yet.
 % adprep: adiabatic ramp along second diagonal (epsilon) from val(1) to val(2), ramp duration time.
 % adread: same, going the other way.
+%
+% MARKTAB:
+%  each column gives a marker pulse
+%  [ start_time; ch1_mk1_wid ; ch1_mk2_wid ; ch_2_mk1_wid ...]
+% ie,
+%  [ 2 ; 0 ; 1 ; 0 ; 1 ] fires markers ch1mk1 and ch2mk2 for 1 us starting at 2us.
 
 % (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
 
@@ -192,7 +198,7 @@ switch pulse.format
             filltime = filltime - pulsetab(1, end);
             if filltime < 0
                 pulsetab
-                error('Pulse too long by %g.',-filltime);
+                error('Pulse too long by %g (target %g).',-filltime,filltime+pulsetab(1,end));
             end
             pulsetab(1, fillpos+1:end) = pulsetab(1, fillpos+1:end) + filltime;
             if ~isempty(readpos)

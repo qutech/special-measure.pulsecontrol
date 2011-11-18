@@ -307,7 +307,7 @@ for k = 1:length(name)
             end
 
         case 'upload'
-            if ~isempty(strfind(ctrl, 'force')) || plslog(end).time(end) < lastupdate
+            if ~isempty(strfind(ctrl, 'force')) || plsinfo('stale',grpdef.name)
                 %  modified since last upload (or upload forced)
 
                 % A little naughty; secretly pack all the pulse waveforms together for load...

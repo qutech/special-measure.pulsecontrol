@@ -16,16 +16,11 @@ global plsdata;
 
 if strcmp(groups, 'pack')
    grps={awgdata(1).pulsegroups.name};
-   awgclear('all',options);
-   awgrm(1,'after');
-   awgrm(1);   
+   awgclear('all',options);   
    awgadd(grps);
    return;
 end
-    for a=1:length(awgdata)
-      fprintf(awgdata(a).awg,'WLIS:WAV:DEL ALL\n')
-    end
-
+  
 if strcmp(groups, 'all') 
           % Mark only groups known to be loaded as loaded.
     if isempty(strfind(options,'paranoid'))
@@ -33,24 +28,29 @@ if strcmp(groups, 'all')
     else  % Mark all pulse groups as not loaded
        g=plsinfo('ls');
     end
-    fprintf(awgdata.awg,'WLIS:WAV:DEL ALL\n')
+    for a=1:length(awgdata)
+      fprintf(awgdata(a).awg,'WLIS:WAV:DEL ALL\n')
+      awgdata(a).zeropls=[];
+    end
+  
     logentry('Cleared all pulses.');
     for i=1:length(g)        
        load([plsdata.grpdir, 'pg_', g{i}, '.mat'], 'plslog');       
        if(plslog(end).time(end) <= 0)
-          fprintf('Skipping group ''%s''; already unloaded\n',g{i});
+          %fprintf('Skipping group ''%s''; already unloaded\n',g{i});
        else          
           plslog(end).time(end+1) = -now;
           save([plsdata.grpdir, 'pg_', g{i}, '.mat'], 'plslog','-append');
-          fprintf('Marking group ''%s'' as unloaded\n',g{i});
+          %fprintf('Marking group ''%s'' as unloaded\n',g{i});
        end
     end
+    awgrm('all');
     return;       
 end
 
 if strcmp(groups,'unused')
     g=awgwaveforms;
-    g2={awgdata.pulsegroups.name};
+    g2={awgdata(1).pulsegroups.name};
     groups=setdiff(g,g2);
     for i=1:length(groups)
       fprintf('Unloading %s\n',groups{i});
@@ -74,25 +74,24 @@ for a=1:length(awgdata)
                 tic;
             end
         end
-        return;
+        awgcntrl('wait');
+        return;        
     end
-    awgcntrl('wait');
 end
 
 for k = 1:length(groups)
-    load([plsdata.grpdir, 'pg_', groups{k}], 'zerolen', 'plslog');
-    awgrm(groups{k});
-    
-    
-    for i = 1:size(zerolen, 1)
-        for j = find(zerolen(i, :) < 0)
-            for a=1:length(awgdata)
-              fprintf(awgdata(a).awg, sprintf('WLIS:WAV:DEL "%s_%05d_%d"', groups{k}, i, j));
-            end
+    load([plsdata.grpdir, 'pg_', groups{k}], 'plslog');
+    for a=1:length(awgdata)
+        wfms=awgwaveforms(groups{k},a,'delete');
+        for i=1:length(wfms)
+            fprintf(awgdata(a).awg, sprintf('WLIS:WAV:DEL "%s"', wfms{i}));
         end
     end
-    plslog(end).time(end+1) = -now;
-    save([plsdata.grpdir, 'pg_', groups{k}], '-append', 'plslog');
-    logentry('Cleared group %s.', groups{k});
-    fprintf('Cleared group %s.\n', groups{k});
+
+plslog(end).time(end+1) = -now;
+save([plsdata.grpdir, 'pg_', groups{k}], '-append', 'plslog');
+logentry('Cleared group %s.', groups{k});
+fprintf('Cleared group %s.\n', groups{k});
+
+awgrm(groups{k});
 end
