@@ -6,7 +6,7 @@ global awgdata;
   
   for a=1:length(awgdata)
       npls=str2num(query(awgdata(a).awg,'WLIS:SIZE?'));
-      if isfield(awgdata(a),'waveforms') && length(awgdata(a).waveforms) == npls
+      if isfield(awgdata(a),'waveforms') && (length(awgdata(a).waveforms) == npls)
           return;
       end
       fprintf('AWG waveform list out of date.  Syncing.');

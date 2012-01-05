@@ -33,7 +33,9 @@ plssync('load');
 % Hack that only makes sense in our setup.
 if exist('smdata', 'var') && isfield(smdata, 'inst')
     awgdata(1).awg = smdata.inst(sminstlookup('AWG5000')).data.inst;
-    awgdata(2).awg = smdata.inst(sminstlookup('AWG7000')).data.inst;
+    if length(awgdata) > 1
+      awgdata(2).awg = smdata.inst(sminstlookup('AWG7000')).data.inst;
+    end
 end
 awgloaddata;
 return;

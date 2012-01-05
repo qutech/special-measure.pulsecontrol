@@ -265,11 +265,16 @@ for k = 1:length(name)
                 repmat(grpdef.offset, 1, size(grpdef.pulses(i).data(c).wf, 2)));
             if isfield(grpdef, 'trafofn') && ~isempty(grpdef.trafofn)
                 wf=grpdef.pulses(i).data(c).wf;
-                fn=grpdef.trafofn.func;
-                args=grpdef.trafofn.args;
-                for matlab_scoping_sucks=1:size(wf,1)
-                    wf(matlab_scoping_sucks,:) = ...
-                        fn(wf(matlab_scoping_sucks,:),matlab_scoping_sucks,args);
+                for qq=1:length(grpdef.trafofn)
+                  fn=grpdef.trafofn(qq).func;
+                  args=grpdef.trafofn(qq).args;
+                  if ~iscell(args)
+                      args={args};
+                  end
+                  for q=1:size(wf,1)
+                    wf(q,:) = ...
+                        fn(wf(q,:),q,args{:});
+                  end
                 end
                 grpdef.pulses(i).data(c).wf=wf;
             end

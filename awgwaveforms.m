@@ -22,7 +22,7 @@ if ~exist('group','var') || isempty(group)
     i=strmatch('trig',waveforms);
     waveforms(i)=[];
 else
-    waveforms = regexp(awgdata(awg).waveforms,sprintf('(%s)_\d+_\d+',group));
+    waveforms = regexp(awgdata(awg).waveforms,sprintf('(%s)_\\d+_\\d+',group));
     ind = find([cellfun(@(x) ~isempty(x) && x == 1 , waveforms)]);
     
     waveforms=awgdata(awg).waveforms(ind);
