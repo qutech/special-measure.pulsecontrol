@@ -1,5 +1,5 @@
 function awgsyncwaveforms()
-% Make sure the list of pulses is awgdata is consistent with the awg.
+% Make sure the list of pulses in awgdata is consistent with the awg.
 % we assume if the number of pulses is right, everything is.\
 global awgdata;
   awgcntrl('clr');
@@ -13,7 +13,7 @@ global awgdata;
       awgdata(a).waveforms=cell(npls,1);
       for l=1:npls
           r=query(awgdata(a).awg,sprintf('WLIS:NAME? %d',l-1));
-          awgdata(a).waveforms{l}=r(2:end-1);
+          awgdata(a).waveforms{l}=r(2:end-2); %-2 since communication adds newline at end
       end
       fprintf('..  Done.\n');
   end

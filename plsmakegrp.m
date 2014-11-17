@@ -2,7 +2,7 @@ function grpdef = plsmakegrp(name, ctrl, ind, opts)
 % grpdef = plsmakegrp(name, ctrl, ind, opts)
 % Covert pulses in pulsegroup to wf format.
 % name: group name.
-% ctrl: 'plot', 'check', 'upload'
+% ctrl: 'plot', 'plot chrg', 'check', 'upload'
 %       for maintenance/debugging: 'clrzero', 'local'.
 %       These may mess with the upload logging, so use with care.
 % ind: optional pulse index. The default is pulseind or all pulses.
@@ -67,6 +67,10 @@ for k = 1:length(name)
     end
     if ~ isfield(grpdef, 'params')
         grpdef.params = [];
+    end
+    if  isfield(grpdef, 'time')&& ~isempty(grpdef.time)  
+        fprintf('Ignoring opts.time ');
+        opts.time=grpdef.time;        
     end
     
     switch grpdef.ctrl(1:min([end find(grpdef.ctrl == ' ', 1)-1]))

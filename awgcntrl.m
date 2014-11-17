@@ -108,7 +108,7 @@ for k = 1:size(breaks, 2);
         case 'isexton'
             val=[];
             for a=1:length(awgdata)
-                if ~is7k(awgadata(a))
+                if ~is7k(awgdata(a))
                     for i = ch(awgdata(a), chans)
                         
                         fprintf(awgdata(a).awg, 'SOUR%i:COMB:FEED?',i);

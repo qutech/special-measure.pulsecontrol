@@ -21,7 +21,10 @@ function pulse = plstotab(pulse)
 %       Idea for future development: allow several fills, each spreading a subset.
 %       Would need a second element to flush previous fill, could be fill without time.
 % wait: stay at val (row vector, one entry for each channel) for duration time.
-%   If val has 3 entries, third is a scaling factor for the first two.
+%       If val has 3 entries, third is a scaling factor for the first two.
+% mwait: multiple wait, stay at [val(i) -val(i)] for duration time(i).
+%       last val entry is a scaling factor, values at 4mV before scaling
+%       stay at 4mV ('zero' value for gates)
 % reload: relaod pulse at val (row vector, one entry for each channel).
 %         time: [ramp time, wait time at load point, wait time at (0, 0) after load] 
 % meas: measurement stage at [0, 0] for time(1), RF marker delayed by time(2) and
@@ -45,7 +48,7 @@ function pulse = plstotab(pulse)
 %  each column gives a marker pulse
 %  [ start_time; ch1_mk1_wid ; ch1_mk2_wid ; ch_2_mk1_wid ...]
 % ie,
-%  [ 2 ; 0 ; 1 ; 0 ; 1 ] fires markers ch1mk1 and ch2mk2 for 1 us starting at 2us.
+%  [ 2 ; 0 ; 1 ; 0 ; 1 ] fires markers ch1mk2 and ch2mk2 for 1 us starting at 2us.
 
 % (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
 
@@ -75,6 +78,7 @@ switch pulse.format
         fillpos = [];
         readout = [];
         readpos = [];
+        pulsefn=[]; 
         
         pulsedef = pulse.data;
         
@@ -101,6 +105,23 @@ switch pulse.format
                           pulsetab(2:3, end+(-1:0)) = repmat(pulsedef(i).val(1:2)', 1, 2);
                         end
                     end
+                case 'mwait'; % multiple wait
+                    if pulsedef(i).time(1) > 1e-11
+                        lseg = length(pulsedef(i).val)-1;
+                        pulsetab(1, end+(1:2*lseg)) = pulsetab(1, end) + cumsum(reshape([repmat(dt,1,lseg); pulsedef(i).time],1,2*lseg));
+%                         pulsetab(1, end+(1:2*lseg)) = pulsetab(1, end) + reshape([cumsum(pulsedef(i).time)+dt-pulsedef(i).time(1); cumsum(pulsedef(i).time)],1,2*lseg);
+                        % first find non-'zeros' values and scale
+                        mask=find(pulsedef(i).val(1:lseg)<pulsedef(i).val(lseg));
+                        pulsedef(i).val(mask)=pulsedef(i).val(mask).*pulsedef(i).val(end);
+                        %find values above base val and make them base val
+                        mask=find(pulsedef(i).val(1:lseg)>pulsedef(i).val(lseg));
+                        pulsedef(i).val(mask)=pulsedef(i).val(lseg);
+                        %make pulsetab
+                        pulsetab(2, end+(-(2*lseg-1):0)) = reshape(repmat(pulsedef(i).val(1:lseg),2,1),1,2*lseg);
+                        pulsetab(3, end+(-(2*lseg-1):0)) = -reshape(repmat(pulsedef(i).val(1:lseg),2,1),1,2*lseg);
+                        
+
+                end
 
                 case 'reload'
                     % If we're filling the load, push the fillpos 1 forward
@@ -182,6 +203,90 @@ switch pulse.format
                         pulsetab(2:3, end-1) = pulsedef(i).val(2)  * dir;
                         pulsetab(2:3, end) = pulsedef(i).val(1)  * dir;
                     end
+                    
+                case 'rf'
+                    global plsdata; % needed for tbase to scale freq
+                    
+                    
+                    % val = [freq amplitude phase]
+                    %                      pulsedef(i).val(1) = pulsedef(i).val(1)./ (1e9/plsdata.tbase);
+                    
+                    freq=pulsedef(i).val(1); %in MHz
+                    amp=pulsedef(i).val(2); % in mV
+                    phase=pulsedef(i).val(3); % in rads
+                    fm_f= pulsedef(i).val(4); % frequency of FM modulation
+                    fm_amp=pulsedef(i).val(5); % depth of FM modulation (zero-peak)
+       
+                    I = @(t) 2*amp*cos(2*pi*freq*t+fm_amp*sin(2*pi*fm_f*t)+phase); % AWG expects Vpp on default, Vpp=2*Vp, I and Q scaled
+                    zero = @(t) 0;
+                    
+                                 
+                    if pulsedef(i).time(1) > 1e-11
+                        pulsetab(1, end+1) = pulsetab(1, end) + pulsedef(i).time(1);
+                        pulsetab(2:3,end) = [I(pulsedef(i).time(1));0];
+                        pulsefn(end+1).fn = {I,zero};
+                        pulsefn(end).t = [pulsetab(1,end+(-1:0))];
+                    else
+                        pulsetab = [pulsetab, [0; I(0); 0]];  
+                    end
+%                   'rf' has marktab HIGH for M1 and M2 during rf pulse  
+                    marktab(:, end+1) = [pulsetab(1, end-1)-pulsedef(i).time(2); 0; pulsedef(i).time(1:3)*[1; 1; 1]; 0; 0];
+                    
+                case 'rf_chirp'   ;% linear sweep of freq over edsr burst 
+                    global plsdata; % needed for tbase to scale freq
+                    
+                    % val = [freq amplitude phase fm_amp(p-p) tau]
+                    % pulsedef(i).val(1) = pulsedef(i).val(1)./ (1e9/plsdata.tbase);
+                    
+                    freq=pulsedef(i).val(1); %in MHz
+                    amp=pulsedef(i).val(2); % in mV
+                    phase=pulsedef(i).val(3); % in rads
+                    fm_amp=pulsedef(i).val(4); % depth of FM modulation (full min-max range)
+                    tau = pulsedef(i).time(1); % length of edsr burst
+                    
+                    I = @(t) 2*amp*cos(2*pi*((freq-fm_amp/2)*t+((fm_amp/tau)*t.^2)+phase)); % AWG expects Vpp on default, Vpp=2*Vp, I and Q scaled
+                    zero = @(t) 0;
+                    
+                    if pulsedef(i).time(1) > 1e-11
+                        pulsetab(1, end+1) = pulsetab(1, end) + pulsedef(i).time(1);
+                        pulsetab(2:3,end) = [I(pulsedef(i).time(1));0];
+                        pulsefn(end+1).fn = {I,zero};
+                        pulsefn(end).t = [pulsetab(1,end+(-1:0))];
+                    else
+                        pulsetab = [pulsetab, [0; I(0); 0]];
+                    end
+                    %                   'rf_chirp' has marktab HIGH for M1 and M2 during rf pulse
+                    marktab(:, end+1) = [pulsetab(1, end-1)-pulsedef(i).time(2); 0; pulsedef(i).time(1:3)*[1; 1; 1]; 0; 0];
+                  
+                case 'rfmarkoff'
+                    global plsdata; % needed for tbase to scale freq
+                    
+                    
+                    % val = [freq amplitude phase]
+                    %                      pulsedef(i).val(1) = pulsedef(i).val(1)./ (1e9/plsdata.tbase);
+                    
+                    freq=pulsedef(i).val(1); %in MHz
+                    amp=pulsedef(i).val(2); % in mV
+                    phase=pulsedef(i).val(3);
+                    fm_f= pulsedef(i).val(4); % frequency of FM modulation
+                    fm_amp=pulsedef(i).val(5); % depth of FM modulation (zero-peak)
+       
+                    I = @(t) amp*cos(2*pi*freq*t+fm_amp*sin(2*pi*fm_f*t)+phase); % AWG expects Vpp on default, Vpp=2*Vp, I and Q scaled
+                    zero = @(t) 0;
+                    
+                                 
+                    if pulsedef(i).time(1) > 1e-11
+                        pulsetab(1, end+1) = pulsetab(1, end) + pulsedef(i).time(1);
+                        pulsetab(2:3,end) = [I(pulsedef(i).time(1));0];
+                        pulsefn(end+1).fn = {I,zero};
+                        pulsefn(end).t = [pulsetab(1,end+(-1:0))];
+                    else
+                        pulsetab = [pulsetab, [0; I(0); 0]];  
+                    end
+%                   'rf' has marktab HIGH for M1 and M2 during rf pulse  
+                    marktab(:, end+1) = [pulsetab(1, end-1)-pulsedef(i).time(2); pulsedef(i).time(1:3)*[0; 0; 0]; pulsedef(i).time(1:3)*[0; 0; 0]; 0; 0];
+                                        
+                                        
                 otherwise
                     error('Invalid pulse element %i: %s.\n', i, pulsedef(i).type)
             end
@@ -212,6 +317,13 @@ switch pulse.format
 
         pulse.data = struct;
         pulse.data.pulsetab = pulsetab;
+        
+        if ~isempty(pulsefn)
+            pulsefn.t(1:end)=pulsefn.t(1:end)+filltime;
+            pulse.data.pulsefn=pulsefn;
+        end
+        
+        
         pulse.data.marktab = sortrows(marktab',1)';
         pulse.data.readout = readout;
         pulse.data.elem=pulsedef;  % Copy forward documentation.

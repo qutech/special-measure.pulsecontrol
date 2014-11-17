@@ -17,7 +17,7 @@
 
 global awgdata;
 global plsdata;
-
+error('not on this pc idiot')% TB 
 tic;
 if strcmp(computer, 'GLNX86')
     plsdata.datafile = '~ygroup/qDots/awg_pulses/plsdata_1110.mat';

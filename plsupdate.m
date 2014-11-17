@@ -6,6 +6,8 @@ function plsupdate(newdef)
 % same. The current time is stored in lastupdate. Changing jump and nrep only
 % (no other fields set) does not require reloading pulses.
 
+% l.76: Also change time if exists in newdef (Pascal 2014_04_03)
+
 % (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
 
 % Not implmented: Missing or nan entries of params are taken from previous values.
@@ -70,6 +72,11 @@ end
 
 if isfield(newdef, 'xval')
     grpdef.xval = newdef.xval;
+    plschng = 1;
+end
+
+if isfield(newdef, 'time')
+    grpdef.time = newdef.time;
     plschng = 1;
 end
 

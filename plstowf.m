@@ -144,6 +144,7 @@ for c=1:length(clk)
               mask = time(1:end-1) >= marktab(1, i) - dt &...
                   time(1:end-1) < marktab(1, i) + marktab(j*2+k-1, i)-2e-11;
               marker(j, mask) = bitor(marker(j, mask), k);
+%               marker(2*(j-1)+k-1, mask) = bitor(marker(j, mask), k); % markers were overwriting each other ST(not RM)
           end
       end
   end

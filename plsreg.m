@@ -25,3 +25,4 @@ else
     plsdata.pulses(plsnum) = pulse;
 end
 
+%  add plssync('save') here?

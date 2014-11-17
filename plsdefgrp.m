@@ -1,4 +1,4 @@
-function plsdefgrp(grpdef)
+function plsdefgrp(grpdef, varargin)
 % pldefsgrp(grpdef)
 % ctrl: ctrl string for useful default options.
 % Starts with group type, then switches:
@@ -6,6 +6,7 @@ function plsdefgrp(grpdef)
 %        notrig
 %        cat 
 %        seq
+% varargin{1}: if true, then do not display overwrite warnings
 %
 % nrep: rep counts, defaults to 1
 % jump: overrides default jumps
@@ -45,6 +46,11 @@ function plsdefgrp(grpdef)
 
 % (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
 
+if nargin > 1 && varargin{1}
+    disableOverwriteWarning = true;
+else
+    disableOverwriteWarning = false;
+end;
 
 if length(grpdef) > 1
     if iscell(grpdef)
@@ -63,7 +69,7 @@ global plsdata;
 
 file = [plsdata.grpdir, 'pg_', grpdef.name];
 
-if exist(file, 'file') || exist([file, '.mat'], 'file')
+if exist(file, 'file') || exist([file, '.mat'], 'file') && ~disableOverwriteWarning
     fprintf('File %s exists. Overwrite? (yes/no)', file);
     while 1
         str = input('', 's');

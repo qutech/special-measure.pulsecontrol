@@ -4,6 +4,7 @@ function pd = pdload(name, opts)
 % dictionary if opts='all'
 % if opts is a number, load the most recent dictionary before that.
 
+% l.29: changed < to <=, FIX ME MAYBE? 2014_04_03 Tim and Pascal
 
 % (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
 
@@ -25,7 +26,7 @@ else
   load([plsdata.grpdir, 'pd_', name]);
   if isnumeric(opts) && ~isempty(opts)
      times=cellfun(@(x) getfield(x,'time'),pd);
-     i=find(times < opts,1,'last');     
+     i=find(times <= opts,1,'last');     
      pd=pd{i};
   end  
 end
