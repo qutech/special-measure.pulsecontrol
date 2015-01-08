@@ -1,0 +1,425 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Functions by Category</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-01-21"><meta name="DC.source" content="pulsecontrol_functions_by_cat.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Functions by Category</h1><!--introduction--><p>Special Measure Pulsecontrol</p><p>Requires Instrument Control Toolbox&#8482;.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">AWG Control</a></li><li><a href="#2">Pulse Databse Management</a></li></ul></div><h2>AWG Control<a name="1"></a></h2><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'awgadd.m'))"><tt>awgadd(groups)</tt></a></p><p>Uploads one or more pulsegroups to the connected AWG.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'awgclear.m'))"><tt>awgclear(groups,options)</tt></a></p><p>Used to delete pulses from the AWG or clear them up.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'awgcntrl.m'))"><tt>val = awgcntrl(cntrl, chans))</tt></a></p><p>Control the AWG to start/stop, etc.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'awggetdata.m'))"><tt>data = awggetdata(time)</tt></a></p><p>Load latest awgdata.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'awggroups.m'))"><tt>awggroups(ind)</tt></a></p><p>Prints a list of the pulsegroups in the awgdata struct.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'awggrpind.m'))"><tt>grp = awggrpind(grp)</tt></a></p><p>Find group index in awgdata.pulsegroups based on provided group name.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'awglist.m'))"><tt>awglist(ind,awg)</tt></a></p><p>List the waveforms present on an AWG.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'awgload.m'))"><tt>zerolen = awgload(grp, ind)</tt></a></p><p>Transmit pulses from group to AWG.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'awgloaddata.m'))"><tt>awgloaddata()</tt></a></p><p>Load latest awgdata file saved by awgsavedata().</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'awgnpulse.m'))"><tt>awgnpulse(groups, npulse)</tt></a></p><p>Set npulse for pulsegroups.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'awgrm.m'))"><tt>awgrm(grp, ctrl)</tt></a></p><p>Used to delete pulses from the AWG.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'awgsavedata.m'))"><tt>awgsavedata()</tt></a></p><p>Save awgdata in plsdata.grpdir, with name generated from date and time.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'awgseqind.m'))"><tt>seqind = awgseqind(pulses,rep)</tt></a></p><p>Find the pulse line associated with a pulse group or pulse index.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'awgswap.m'))"><tt>awgswap(name)</tt></a></p><p>Swap the current active AWG with an alternative.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'awgsyncwaveforms.m'))"><tt>awgsyncwaveforms()</tt></a></p><p>Make sure the list of pulses is awgdata is consistent with the AWG.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'awgupdate.m'))"><tt>awgupdate(groups)</tt></a></p><p>Obsolete!</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'awgwaveforms.m'))"><tt>waveforms = awgwaveforms(group,awg,opts)</tt></a></p><p>Give a list of waveforms that are known to be loaded.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'awgzero.m'))"><tt>zerolen = awgzero(grp, ind, zerolen)</tt></a></p><p>Helper function to determine if a pulse is zero.</p><p>
+ <br>
+</p><h2>Pulse Databse Management<a name="2"></a></h2><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'plsdefault.m'))"><tt>pulse = plsdefault(pulse)</tt></a></p><p>Enshures correct pulse-formating and updates the format-string pulse.format depending on the content of pulse.data.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'plslist.m'))"><tt>inds = plslist(rng, name)</tt></a></p><p>Tabular representation of specified pulses.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'plsplot.m'))"><tt>plsplot(pulse, dict, ctrl)</tt></a></p><p>Plots pulse using plstowf() as time vs. channelA and channelB, channelA vs. channelB, time vs. markerA and markerB.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'plsreadxval.m'))"><tt>plsreadxval()</tt></a></p><p>Extracts xval from pulses inside plsdata.pulses database and collecting them in plsdata.xval.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'plsreg.m'))"><tt>plsnum = plsreg(pulse, plsnum)</tt></a></p><p>Adds pulse to plsdata.pulses database, while enshuring correct elements and correct order of elements.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'plssync.m'))"><tt>plssync(ctrl)</tt></a></p><p>Used to save and load pulse databese plsdata, while enshuring correct path-handling.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'plstotab.m'))"><tt>pulse = plstotab(pulse)</tt></a></p><p>Downconverts pulses of format 'elem' to format 'tab'.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'plsIqFnCreate.m'))"><tt>[I Q] = plsIqFnCreate(coeff, ...)</tt></a></p><p>Auxiliary function for plstotab(), to process pulse elements of type 'rfpulse'.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'plstowf.m'))"><tt>pulse = plstowf(pulse, dict)</tt></a></p><p>Downconverts pulses of format 'tab' to format 'wf'.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'plsdefgrp.m'))"><tt>plsdefgrp(grpdef)</tt></a></p><p>Enshures correct group-formating. Saves a pulse group to the path specified in plsdata.grpdir.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'plslint.m'))"><tt>plslint(pg)</tt></a></p><p>Some preliminary checks for a pulsegroups.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'plsmakegrp.m'))"><tt>grpdef = plsmakegrp(name, ctrl, ind, opts)</tt></a></p><p>Processes pulse group to 'wf' format and saves to disk. Used by awgadd(). Can be controlled by a string ctrl containing swiches:</p><div><ul><li>'plot': plot pulse group</li><li>'check': check if any voltage value is out of awgdata.scale bounds</li><li>'upload': uploads pulse group to the AWG</li></ul></div><p>Changes to the pulsegroup are logged inside plslog (stored with pulse).</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'plsupdate.m'))"><tt>plsupdate(newdef)</tt></a></p><p>Updates the fields of a pulsegroup. The fields name, chan, markmap, offset, pulseind, pulses cannot be updated. Formatting of the other fields must remain the same.</p><p>
+ <br>
+</p><p><a href="matlab:open(fullfile(fileparts(which('plstotab')),'plsinfo.m'))"><tt>val = plsinfo(ctrl, group, ind, time)</tt></a></p><p>Used to retrieve fileds of a pulsegroup at a given time or check if the provided group is stale ( previously not existing, old timestamp, ...). Variable at a given time can be reclaimed using the ctrl strings:</p><div><ul><li>'ro': returns readout</li><li>'zl': returns zerolen</li><li>'gd': returns grpdef</li><li>'sl': returns seqlog</li></ul></div><p>Ctrl strings not honoring time:</p><div><ul><li>'ls': list/returns pulsegroup(s) of provided name(mask) in grpdir. E.g. 'dBz*'</li><li>'params': returns params</li><li>'pl' or 'log': returns plslog</li><li>'rev': prints avalible revisions of the pulse in plslog</li><li>'stale': returns, whether the pulse is stale or not</li></ul></div><p class="footer">Copyright 2007-2009 Not The MathWorks, Inc.<br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Functions by Category
+% Special Measure Pulsecontrol
+%
+% Requires Instrument Control Toolbox(TM).
+%
+%% AWG Control
+% <matlab:open(fullfile(fileparts(which('plstotab')),'awgadd.m')) |awgadd(groups)|>
+%
+% Uploads one or more pulsegroups to the connected AWG.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'awgclear.m')) |awgclear(groups,options)|>
+%
+% Used to delete pulses from the AWG or clear them up.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'awgcntrl.m')) |val = awgcntrl(cntrl, chans))|>
+%
+% Control the AWG to start/stop, etc.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'awggetdata.m')) |data = awggetdata(time)|>
+%
+% Load latest awgdata.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'awggroups.m')) |awggroups(ind)|>
+%
+% Prints a list of the pulsegroups in the awgdata struct.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'awggrpind.m')) |grp = awggrpind(grp)|>
+%
+% Find group index in awgdata.pulsegroups based on provided group name.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'awglist.m')) |awglist(ind,awg)|>
+%
+% List the waveforms present on an AWG.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'awgload.m')) |zerolen = awgload(grp, ind)|>
+%
+% Transmit pulses from group to AWG.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'awgloaddata.m')) |awgloaddata()|>
+%
+% Load latest awgdata file saved by awgsavedata().
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'awgnpulse.m')) |awgnpulse(groups, npulse)|>
+%
+% Set npulse for pulsegroups.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'awgrm.m')) |awgrm(grp, ctrl)|>
+%
+% Used to delete pulses from the AWG.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'awgsavedata.m')) |awgsavedata()|>
+%
+% Save awgdata in plsdata.grpdir, with name generated from date and time.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'awgseqind.m')) |seqind = awgseqind(pulses,rep)|>
+%
+% Find the pulse line associated with a pulse group or pulse index.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'awgswap.m')) |awgswap(name)|>
+%
+% Swap the current active AWG with an alternative.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'awgsyncwaveforms.m')) |awgsyncwaveforms()|>
+%
+% Make sure the list of pulses is awgdata is consistent with the AWG.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'awgupdate.m')) |awgupdate(groups)|>
+%
+% Obsolete!
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'awgwaveforms.m')) |waveforms = awgwaveforms(group,awg,opts)|>
+%
+% Give a list of waveforms that are known to be loaded.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'awgzero.m')) |zerolen = awgzero(grp, ind, zerolen)|>
+%
+% Helper function to determine if a pulse is zero.
+%
+% <html>
+%  <br>
+% </html>
+%
+%% Pulse Databse Management
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'plsdefault.m')) |pulse = plsdefault(pulse)|>
+%
+% Enshures correct pulse-formating and updates the format-string pulse.format depending on
+% the content of pulse.data.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'plslist.m')) |inds = plslist(rng, name)|>
+%
+% Tabular representation of specified pulses.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'plsplot.m')) |plsplot(pulse, dict, ctrl)|>
+%
+% Plots pulse using plstowf() as time vs. channelA and channelB, channelA
+% vs. channelB, time vs. markerA and markerB.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'plsreadxval.m')) |plsreadxval()|>
+%
+% Extracts xval from pulses inside plsdata.pulses database and collecting
+% them in plsdata.xval.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'plsreg.m')) |plsnum = plsreg(pulse, plsnum)|>
+%
+% Adds pulse to plsdata.pulses database, while enshuring correct elements
+% and correct order of elements.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'plssync.m')) |plssync(ctrl)|>
+%
+% Used to save and load pulse databese plsdata, while enshuring correct
+% path-handling.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'plstotab.m')) |pulse = plstotab(pulse)|>
+%
+% Downconverts pulses of format 'elem' to format 'tab'.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'plsIqFnCreate.m')) |[I Q] = plsIqFnCreate(coeff, ...)|>
+%
+% Auxiliary function for plstotab(), to process pulse elements of type
+% 'rfpulse'.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'plstowf.m')) |pulse = plstowf(pulse, dict)|>
+%
+% Downconverts pulses of format 'tab' to format 'wf'.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'plsdefgrp.m')) |plsdefgrp(grpdef)|>
+%
+% Enshures correct group-formating. Saves a pulse group to the path
+% specified in plsdata.grpdir.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'plslint.m')) |plslint(pg)|>
+%
+% Some preliminary checks for a pulsegroups.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'plsmakegrp.m')) |grpdef = plsmakegrp(name, ctrl, ind, opts)|>
+%
+% Processes pulse group to 'wf' format and saves to disk. Used by 
+% awgadd(). Can be controlled by a string ctrl containing swiches:
+%
+% * 'plot': plot pulse group
+% * 'check': check if any voltage value is out of awgdata.scale bounds
+% * 'upload': uploads pulse group to the AWG
+%
+% Changes to the pulsegroup are logged inside plslog (stored with pulse).
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'plsupdate.m')) |plsupdate(newdef)|>
+%
+% Updates the fields of a pulsegroup. The fields name, chan, markmap, offset, pulseind,
+% pulses cannot be updated. Formatting of the other fields must remain the
+% same.
+%
+% <html>
+%  <br>
+% </html>
+%
+% <matlab:open(fullfile(fileparts(which('plstotab')),'plsinfo.m')) |val = plsinfo(ctrl, group, ind, time)|>
+%
+% Used to retrieve fileds of a pulsegroup at a given time or
+% check if the provided group is stale ( previously not existing, old
+% timestamp, ...).
+% Variable at a given time can be reclaimed using the ctrl strings:
+%
+% * 'ro': returns readout
+% * 'zl': returns zerolen
+% * 'gd': returns grpdef
+% * 'sl': returns seqlog
+%
+% Ctrl strings not honoring time:
+%
+% * 'ls': list/returns pulsegroup(s) of provided name(mask) in grpdir. E.g. 'dBz*'
+% * 'params': returns params
+% * 'pl' or 'log': returns plslog
+% * 'rev': prints avalible revisions of the pulse in plslog
+% * 'stale': returns, whether the pulse is stale or not
+%
+% Copyright 2007-2009 Not The MathWorks, Inc.
+
+##### SOURCE END #####
+--></body></html>

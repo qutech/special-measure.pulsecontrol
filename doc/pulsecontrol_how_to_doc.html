@@ -1,0 +1,104 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>How to extend and modify this documentation using publish()</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-10-08"><meta name="DC.source" content="pulsecontrol_how_to_doc.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>How to extend and modify this documentation using <tt>publish()</tt></h1><!--introduction--><p>This documentation follows MATLAB&reg; guidelines defined in <a href="http://www.mathworks.de/de/help/matlab/matlab_prog/display-custom-documentation.html">Custom Documentation</a>.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Short summary of the documentation structure</a></li><li><a href="#2">How to publish an m-file</a></li></ul></div><h2>Short summary of the documentation structure<a name="1"></a></h2><div><ul><li>The content uses <a href="http://www.mathworks.de/de/help/matlab/matlab_prog/marking-up-matlab-comments-for-publishing.html">html-markup</a> for styling</li><li>The topics are seperated into m-files, which are parsed with <tt>publish()</tt> to generate html-files</li><li>The html-files are linked together in the html/..._product_page.html</li><li>html/helptoc.xml provides links to main topics in the documentation browser tree-view</li><li>info.xml directs MATLAB&reg; to the html/ folder containing all documentation files</li></ul></div><p>The m-files of the existing topics are provided as guidiance to write new topics. Existing spelling mistakes or contentual errors should also be corrected inside the m-files. The files must then be re-published as discussed below.</p><h2>How to publish an m-file<a name="2"></a></h2><p>The <tt>publish()</tt> function is used with the following options:</p><pre class="codeinput">opts = struct(<span class="string">'outputDir'</span>, fileparts(which(<span class="string">'pulsecontrol_features.m'</span>)),
+			  <span class="string">'evalCode'</span>, false,
+			  <span class="string">'stylesheet'</span>, [fileparts(which(<span class="string">'pulsecontrol_features.m'</span>)) <span class="string">'/mxdom2simplehtml.xsl'</span>]);
+
+publish(<span class="string">'pulsecontrol_how_to_doc.m'</span>, opts);
+</pre><p>This would re-publish the document you are reading right now, if the current folder is the html/ directory containing this documentation.</p><p>The opts structure contains important options for the publish function. A commun stylesheet mxdom2simplehtml.xsl is used throughout all created html-files to enshure a homogenous layout.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% How to extend and modify this documentation using |publish()|
+% This documentation follows MATLAB(R) guidelines defined in
+% <http://www.mathworks.de/de/help/matlab/matlab_prog/display-custom-documentation.html Custom Documentation>.
+% 
+%% Short summary of the documentation structure
+% * The content uses <http://www.mathworks.de/de/help/matlab/matlab_prog/marking-up-matlab-comments-for-publishing.html html-markup> for styling
+% * The topics are seperated into m-files, which are parsed with |publish()| to generate html-files
+% * The html-files are linked together in the html/..._product_page.html
+% * html/helptoc.xml provides links to main topics in the documentation browser tree-view
+% * info.xml directs MATLAB(R) to the html/ folder containing all documentation files
+%
+% The m-files of the existing topics are provided as guidiance to write new topics.
+% Existing spelling mistakes or contentual errors should also be corrected inside the m-files.
+% The files must then be re-published as discussed below.
+%
+%% How to publish an m-file
+% The |publish()| function is used with the following options:
+%
+opts = struct('outputDir', fileparts(which('pulsecontrol_features.m')),
+			  'evalCode', false,
+			  'stylesheet', [fileparts(which('pulsecontrol_features.m')) '/mxdom2simplehtml.xsl']);
+
+publish('pulsecontrol_how_to_doc.m', opts);
+
+%%
+% This would re-publish the document you are reading right now,
+% if the current folder is the html/ directory containing this documentation.
+%% 
+% The opts structure contains important options for the publish function.
+% A commun stylesheet mxdom2simplehtml.xsl is used throughout all created html-files to enshure a homogenous layout.
+##### SOURCE END #####
+--></body></html>
