@@ -121,7 +121,7 @@ switch pulse.format
                         pulsetab(3, end+(-(2*lseg-1):0)) = -reshape(repmat(pulsedef(i).val(1:lseg),2,1),1,2*lseg);
                         
 
-                end
+                    end
 
                 case 'reload'
                     % If we're filling the load, push the fillpos 1 forward
