@@ -48,6 +48,8 @@ classdef AWG < handle & matlab.mixin.Heterogeneous
         %this function is for debugging purposes
         issueSoftwareTrigger(self);
         
+        val = isPlaybackInProgress(self);
+        
 %         %add a pulsegroup by name to the pulsegroups playable by this
 %         %machineuse is/ deprecated
 %         add(self,pulsegroup)
@@ -87,7 +89,7 @@ classdef AWG < handle & matlab.mixin.Heterogeneous
             hardwareChannels = find( self.virtualChannels == virtualChannel );
         end
         
-        function setActivePulsegroup(self,pulsegroupName)
+        function setActivePulseGroup(self,pulsegroupName)
             if isKey(self.storedPulsegroups,pulsegroupName)
                 self.activeSequence = pulsegroupName;
             else

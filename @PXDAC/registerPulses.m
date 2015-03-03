@@ -1,8 +1,13 @@
 function registerPulses(self,grp)
+
             usedHWchanels = [];
-            for c = grp.chan
+            error('TODO: hahahaha');
+            for c = self.virtualChannels
+                
+                
                 usedHWchanels = [usedHWchanels self.getHardwareChannel(c)];
             end
+            
             channelMask = uint16(sum(2.^(usedHWchanels-1)));
             
             %create pulsegroup object

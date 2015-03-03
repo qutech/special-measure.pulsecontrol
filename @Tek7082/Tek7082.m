@@ -8,7 +8,6 @@ classdef Tek7082 < TekAWG
          %constructor
          function obj = Tek7082(id,handle)
              obj = obj@TekAWG(id,handle);
-             obj.resolution = obj.possibleResolutions(1); %in bits
          end
      end
 end

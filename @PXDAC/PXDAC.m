@@ -75,7 +75,7 @@ classdef PXDAC < AWG
             %
             obj.activeChannelMask = uint16(15);
             
-            obj.clk = 1.2e9;
+            obj.clk = 100e6;
             
             obj.library('SetTriggerModeXD48',obj.handle,2);%single shot trigger mode
             
@@ -215,6 +215,9 @@ classdef PXDAC < AWG
                 end
             end
             
+            self.library('SetPlaybackClockSourceXD48',self.handle,0);
+            self.library('SetClockDivider1XD48',self.handle,12);
+            self.library('SetClockDivider2XD48',self.handle,1);
             
             
             self.library('SetExternalTriggerEnableXD48',...
@@ -269,7 +272,7 @@ classdef PXDAC < AWG
         end
         
         function testStatus(status)
-            if status ~= 0
+            if status < 0
                 error(statusToErrorMessage);
             end
         end

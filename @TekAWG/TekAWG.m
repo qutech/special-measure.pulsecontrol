@@ -20,6 +20,8 @@ classdef TekAWG < AWG
             obj = obj@AWG(id);
             obj.handle = handle;
             
+            class(obj);
+            
             obj.clk = 1.2e9;
             
             obj.zerochan = ones(1,obj.nChannels);
@@ -37,18 +39,22 @@ classdef TekAWG < AWG
         
         
         % implemented abstact methods
-        add(self,pulsegroup)
+        %make this pulsegroup playable by AWG
+        addPulseGroup(self,grpdef);
         
-        val = control(self,cntrl, chans)
-
-        erase(self,groups,options)
+        %remove this pulsegroup from memory and forget about it
+        removePulseGroup(self,name);
+        
+        %update the changed pulses
+        updatePulseGroup(self,grpdef);
+        
+        %wait for trigger
+        arm(self);
+        
+        %this function is for debugging purposes
+        issueSoftwareTrigger(self);
         
         syncwaveforms(self)
-        
-        upload(self,name)
-        
-        
-        rm(self,grp, ctrl)
         
         loadwfm(self,data, marker, name, chan,define)
     end

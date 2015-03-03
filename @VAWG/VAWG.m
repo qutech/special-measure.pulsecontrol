@@ -113,9 +113,28 @@ classdef VAWG < handle
             self.virtualToHardWare{virtualChannel}{entry} = [];
         end
         
-        function setActivePulsegroup(self,groupName)
+        function setActivePulseGroup(self,groupName)
             for awg = self.awgs
-                awg.setActivePulsegroup(groupName);
+                awg.setActivePulseGroup(groupName);
+            end
+        end
+        
+        function arm(self)
+            for awg = self.awgs
+                awg.arm();
+            end
+        end
+        
+        function val = isPlaybackInProgress(self)
+            activePlaybacks = zeros(1,length(self.awgs));
+            for awg = 1:length(self.awgs)
+                activePlaybacks(awg) = self.awgs(awg).isPlaybackInProgress();
+            end
+            
+            val = sum(activePlaybacks)>0;
+            
+            if sum(activePlaybacks) ~= 0 && sum(activePlaybacks) ~= length(self.awgs)
+                warning('One AWGs is still playing while another one has finished!');
             end
         end
         
