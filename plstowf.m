@@ -30,7 +30,8 @@ function pulse = plstowf(pulse, dict)
 dt=1e-11;
 
 global plsdata;
-global awgdata;
+global vawg;
+
 pulse = plsdefault(pulse);
 
 if strcmp(pulse.format, 'wf')
@@ -72,7 +73,7 @@ end
 if ~isfield(pulseinf, 'readout')
     pulseinf.readout = [];
 end
-clk = unique([awgdata.clk]);
+clk = unique([vawg.awgs.clk]);
 for c=1:length(clk)
   pulsetab = pulseinf.pulsetab;
   nchan = size(pulsetab, 1)-1;

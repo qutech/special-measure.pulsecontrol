@@ -10,10 +10,11 @@ function val = plsinfo(ctrl, group, ind, time)
 
 
 global plsdata;
-global awgdata;
+global vawg;
 
 if nargin >= 2 && ~ischar(group)
-    group = awgdata(1).pulsegroups(group).name;
+    %assume group = [awg group]
+    group = vawg.awg(group(1)).pulsegroups(group(2)).name;
 end
 if ~exist('time','var')
     time=[];
@@ -95,9 +96,10 @@ switch ctrl
         end
         
     case 'ro'
-        ind=awggrpind(group);
-        if ~isnan(ind) && isfield(awgdata(1).pulsegroups(ind),'readout') && ~isempty(awgdata(1).pulsegroups(ind).readout)
-            val=awgdata(1).pulsegroups(ind).readout;
+        error('assure ind is awg index');
+        grpIndex = vawg.awgs(ind).grpind(group);
+        if ~isnan(grpIndex) && isfield(vawg.awgs(ind).pulsegroups(grpIndex),'readout') && ~isempty(vawg.awgs(ind).pulsegroups(grpIndex).readout)
+            val=vawg.pulsegroups(grpIndex).readout;
         else
             warning('off', 'MATLAB:load:variableNotFound');
             load([plsdata.grpdir, 'pg_', group], 'grpdef', 'zerolen','plslog');
@@ -126,10 +128,9 @@ switch ctrl
             end
         end
     case 'zl'
-        ind=awggrpind(group);
-        if ~isnan(ind) && isfield(awgdata(1).pulsegroups(ind),'zerolen') && ~isempty(awgdata(1).pulsegroups(ind).zerolen)
-            val=awgdata(1).pulsegroups(ind).zerolen;
-        else
+%         error('pulseinfo(zl) is deprecated');
+         % vawg.awgs.getPulsegroupField(group,'zerolen');
+
             warning('off', 'MATLAB:load:variableNotFound');
             load([plsdata.grpdir, 'pg_', group], 'zerolen');
             warning('on', 'MATLAB:load:variableNotFound');
@@ -140,7 +141,23 @@ switch ctrl
             end % hack as a dirty bug fix. Size of zerolen does not match group format.
             % would have to read and merge all component groups.
             val = zerolen;
-        end
+
+        
+%         ind=awggrpind(group);
+%         if ~isnan(ind) && isfield(vawg.pulsegroups(ind),'zerolen') && ~isempty(vawg.pulsegroups(ind).zerolen)
+%             val=vawg.pulsegroups(ind).zerolen;
+%         else
+%             warning('off', 'MATLAB:load:variableNotFound');
+%             load([plsdata.grpdir, 'pg_', group], 'zerolen');
+%             warning('on', 'MATLAB:load:variableNotFound');
+%             
+%             if ~exist('zerolen', 'var')
+%                 load([plsdata.grpdir, 'pg_', group], 'grpdef');
+%                 load([plsdata.grpdir, 'pg_', grpdef.pulses.groups{1}], 'zerolen');
+%             end % hack as a dirty bug fix. Size of zerolen does not match group format.
+%             % would have to read and merge all component groups.
+%             val = zerolen;
+%         end
     case 'gd'
         load([plsdata.grpdir, 'pg_', group], 'grpdef');
         val = grpdef;
@@ -151,25 +168,33 @@ switch ctrl
         if(~isempty(time))
            val=val(logentry(val,time)); 
         end
-    case 'stale'        
-        ind=awggrpind(group);
-        if isempty(awgwaveforms(group))
-            val=1;
-        elseif ~isnan(ind) && isfield(awgdata(1).pulsegroups(ind),'lastupdate') && isfield(awgdata(1).pulsegroups(ind),'lastload') && ...
-                ~isempty(awgdata(1).pulsegroups(ind).lastupdate) && ~isempty(awgdata(1).pulsegroups(ind).lastload)
-            val = awgdata(1).pulsegroups(ind).lastload < awgdata(1).pulsegroups(ind).lastupdate;
-        else
-            load([plsdata.grpdir, 'pg_', group], 'lastupdate','plslog','grpdef');
-            if(isempty(strfind(grpdef.ctrl,'seq')))
-                val = lastupdate > plslog(end).time(end);
-                if val && nargout == 0
-                    fprintf('Pulse group ''%s'' is stale.\n',group);
-                end
+    case 'stale'
+        val = false;
+        for awg = vawg.awgs
+            
+            % pulsegroup is unknown to awg
+            % assure that awg.load creates a pulsegroup in
+            % storedPulsegroups even if the awg is not affected
+            if ~isKey(awg.storedPulsegroups,group)
+                val = true;
             else
-                val = 0;
-                for i=1:length(grpdef.pulses.groups)
-                    val = val || plsinfo('stale',grpdef.pulses.groups{i});
+                load([plsdata.grpdir, 'pg_', group], 'lastupdate','plslog','grpdef');
+                
+                if(isempty(strfind(grpdef.ctrl,'seq')))
+                    
+                    val = val || lastupdate > awg.storedPulsegroups(group).lastload;
+                    if val && nargout == 0
+                        fprintf('Pulse group ''%s'' is stale.\n',group);
+                    end
+                else
+                    for i=1:length(grpdef.pulses.groups)
+                        val = val || plsinfo('stale',grpdef.pulses.groups{i});
+                    end
                 end
+            end
+            
+            if val 
+                return;
             end
         end
         
@@ -212,6 +237,8 @@ switch ctrl
                     fprintf('%i: %s - % + further entries\n', i, datestr(plslog(i).time(1)), datestr(plslog(i).time(2)));
             end
         end
+    otherwise
+        warning('plsinfo: unknown command %s',ctrl);
 end
 return
 
