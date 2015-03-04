@@ -261,6 +261,14 @@ classdef PXDAC < AWG
                 temp,self.handle)
             ppVoltage = temp.Value;
         end
+        
+        function playbackInProgress = isPlaybackInProgress(self)
+            libReturn = calllib('PXDAC4800_64','IsPlaybackInProgressXD48', self.handle);
+            if (libReturn < 0)
+                error(statusToErrorMessage(libReturn));
+            end
+            playbackInProgress = (libReturn > 0);
+        end
     end
     
     methods (Static)
