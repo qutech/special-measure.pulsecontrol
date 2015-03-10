@@ -4,23 +4,26 @@ function hardwarePulseTest()
     % pulse to test
     testPulseGroup = initPulseGroup(time);
 
-    % DAQ card
+
+
+    global vawg;
+    % awg to test
+    vawg = initVAWG();
+
+    
+    vawg.add(testPulseGroup.name);
+    vawg.setActivePulseGroup(testPulseGroup.name);
+
+    vawg.arm();
+    
+        % DAQ card
     inputChannel = 1;
     testDAC = initDAC(time,inputChannel);
-
-    % awg to test
-    testVAWG = initVAWG();
-
     
-    testVAWG.add(testPulseGroup.name);
-    testVAWG.setActivePulseGroup(testPulseGroup.name);
-
-    testVAWG.arm();
+    % issues trigger
+    testDAC.startMeasurement();
     
-    % has to be adapted
-    testDAC.issueTrigger();
-    
-    while testVAWG.playbackInProgress()
+    while vawg.playbackInProgress()
         pause(1);
         fprintf('Waiting for playback to finish...\n');
     end
@@ -38,7 +41,9 @@ function dacobject  = initDAC(time,inputChannel)
     dacobject.samprate = 100e6; %samples per second
     sis = time * dacobject.samprate / 1e6; % samples in scanline
     
-    dacobject.configureMeasurement(1,sis,inputChannel);
+    dacobject.useAsTriggerSource();
+    
+    dacobject.configureMeasurement(1,sis,1,inputChannel);
 end
 
 function vawg = initVAWG()
@@ -52,8 +57,20 @@ function vawg = initVAWG()
 end
 
 function pulsegroup = initPulseGroup(time)
-    N = 1000;
+    N = 10;
     rng(42);
+    
+    global plsdata;
+    plsdata = [];
+    plsdata.datafile = [tempdir 'hardwaretest\plsdata_hw'];
+    plsdata.grpdir = [tempdir 'hardwaretest\plsdef\plsgrp'];
+    try
+        rmdir([tempdir 'hardwaretest'],'s');
+    end
+    mkdir(plsdata.grpdir);
+    
+    plsdata.pulses = struct('data', {}, 'name', {},	'xval',{}, 'taurc',{}, 'pardef',{},'trafofn',{},'format',{});
+    plsdata.tbase = 1000;
     
     pulse.data.pulsetab = zeros(2,N);
     pulse.data.pulsetab(1,:) = linspace(1,time,N);

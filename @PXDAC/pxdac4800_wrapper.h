@@ -72,6 +72,30 @@ int LoadRamBufXD48(	HXD48 hBrd,
 int IssueSoftwareTriggerXD48(HXD48 hBrd);
 
 
+// Channel 1 output voltage; [0, 1023]
+int SetOutputVoltageCh1XD48(HXD48 hBrd, int val);
+// Channel 1 output voltage; [0, 1023]
+int GetOutputVoltageCh1XD48(HXD48 hBrd, int bFromCache);
+
+// Channel 2 output voltage; [0, 1023]
+int SetOutputVoltageCh2XD48(HXD48 hBrd, int val);
+// Channel 2 output voltage; [0, 1023]
+int GetOutputVoltageCh2XD48(HXD48 hBrd, int bFromCache);
+
+// Channel 3 output voltage; [0, 1023]
+int SetOutputVoltageCh3XD48(HXD48 hBrd, int val);
+// Channel 3 output voltage; [0, 1023]
+int GetOutputVoltageCh3XD48(HXD48 hBrd, int bFromCache );
+
+// Channel 4 output voltage; [0, 1023]
+int SetOutputVoltageCh4XD48(HXD48 hBrd, int val);
+// Channel 4 output voltage; [0, 1023]
+int GetOutputVoltageCh4XD48(HXD48 hBrd, int bFromCache );
+
+// Obtain peak-to-peak voltage for given output voltage encoding [0, 1023]
+int GetOutputVoltageRangeVoltsXD48(int     val,
+	double* pPeakToPeakVolts,
+	HXD48   hBrd);
 
 
 #endif
