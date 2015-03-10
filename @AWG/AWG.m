@@ -91,7 +91,7 @@ classdef AWG < handle & matlab.mixin.Heterogeneous
         
         function setActivePulseGroup(self,pulsegroupName)
             if isKey(self.storedPulsegroups,pulsegroupName)
-                self.activeSequence = pulsegroupName;
+                self.activePulsegroup = pulsegroupName;
             else
                 error('Can not activate pulsegroup "%s". Since it is not known',sequenceName);
             end

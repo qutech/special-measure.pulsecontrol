@@ -63,7 +63,9 @@ classdef DefaultTestSetup < TestSetup
             self.dac.samprate = 100e6; %samples per second
             sis = self.duration * self.dac.samprate / 1e6; % samples in scanline
 
-            self.dac.configureMeasurement(1, sis, self.inputChannel);
+            self.dac.useAsTriggerSource();
+            
+            self.dac.configureMeasurement(1, sis, 1, self.inputChannel);
         end
         
         function initPulseGroup(self)

@@ -1,11 +1,11 @@
 function registerPulses(self,grp)
 
             usedHWchanels = [];
-            error('TODO: hahahaha');
-            for c = self.virtualChannels
-                
-                
-                usedHWchanels = [usedHWchanels self.getHardwareChannel(c)];
+            
+            for c = grp.chan
+                if any(self.virtualChannels == c)
+                    usedHWchanels = [usedHWchanels self.getHardwareChannel( self.getHardwareChannel(grp.chan(c))) ];
+                end
             end
             
             channelMask = uint16(sum(2.^(usedHWchanels-1)));

@@ -96,6 +96,10 @@ classdef PXDAC < AWG
                 
                 status = calllib('PXDACMemoryManager','initializeU16',obj.handle,uint32(maxsamples),uint32(chunksamples));
                 chunkexponent = chunkexponent-1;
+                
+                if chunkexponent == 0
+                    error('can not allocate enouch DMA buffers for PXDAC.');
+                end
             end
             fprintf('Initialized memory manager with 2^%d samples per chunk.\n', chunkexponent);
             
