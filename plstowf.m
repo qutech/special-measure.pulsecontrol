@@ -93,22 +93,7 @@ for c=1:length(clk)
   end
   
   for j = 1:nchan
-      for i = 2:size(pulsetab, 2)          
-          mask = time >= pulsetab(1, i-1)-dt & time <= pulsetab(1, i)+dt;
-          % added small shifts to mitigate rounding errors 08/04/09. Never seen to matter.
-          % below makes writes the pulse into data using lines to connect the
-          % corners defined in pulstab
-          if 0
-              data(j, mask) = (-pulsetab(j+1, i-1) * (time(mask) - pulsetab(1, i)) ...
-                  + pulsetab(j+1, i) * (time(mask) - pulsetab(1, i-1)))./...
-                  (pulsetab(1, i) -  pulsetab(1, i-1));
-          else
-              data(j, mask) = ((-pulsetab(j+1, i-1) + pulsetab(j+1,i)) * time(mask) + ...
-                  pulsetab(j+1,i-1) * pulsetab(1, i) - pulsetab(j+1,i) * pulsetab(1, i-1))./...
-                  (pulsetab(1, i) -  pulsetab(1, i-1));
-          end
-          
-      end
+      data(j,:) = interp1(pulsetab(1,:),pulsetab(2,:),time);
   end
   % lets pulses be defined with functions (eg. sin, cos) instead of
   % just lines
