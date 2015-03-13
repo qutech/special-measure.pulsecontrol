@@ -6,6 +6,10 @@ classdef DefaultTestSetup < TestSetup
         vawg;
     end
     
+    properties(SetAccess = protected, GetAccess = public)
+        errorThreshold = 1e-3; % RMS error threshold in Volt
+    end
+    
     methods (Access = public)
         
         function obj = DefaultTestSetup()
@@ -15,7 +19,7 @@ classdef DefaultTestSetup < TestSetup
             obj.inputChannel = 1;
         end
         
-        function initiate(self)
+        function init(self)
             % pulse to test
             self.initPulseGroup();
 
@@ -31,7 +35,7 @@ classdef DefaultTestSetup < TestSetup
             self.vawg.arm();
         end
         
-        function run(self)
+        function success = run(self)
             self.dac.issueTrigger();
     
             while self.vawg.playbackInProgress()
@@ -40,7 +44,7 @@ classdef DefaultTestSetup < TestSetup
             end
 
             measuredData = self.dac.getResult(self.inputChannel);
-            self.evaluate(measuredData);
+            success = self.evaluate(measuredData);
         end
         
     end
@@ -85,6 +89,9 @@ classdef DefaultTestSetup < TestSetup
             self.pulsegroup.ctrl = 'notrig';
 
             plsdefgrp(self.pulsegroup);
+            
+            p = plstowf(pulse);
+            self.expectedData = p.data.wf;
         end
         
     end

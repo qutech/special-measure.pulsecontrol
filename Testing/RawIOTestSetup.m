@@ -1,10 +1,7 @@
 classdef RawIOTestSetup < DefaultTestSetup
     
-    methods (Access = protected)
-        function evaluate(self, measured)
-            error('Not implemented yet!');
-        end
+    properties(SetAccess = protected, GetAccess = public)
+        errorThreshold = 1e-3; % RMS error threshold in Volt
     end
-    
 end
 

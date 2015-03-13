@@ -8,6 +8,10 @@ classdef RSAIOTestSetup < DefaultTestSetup
         test_random_points = 20; % must be < test_end - test_start
     end
     
+    properties(SetAccess = protected, GetAccess = public)
+        errorThreshold = 1e-4; % RMS error threshold in Volt
+    end
+    
     methods (Access = public)
         
         function obj = RSAIOTestSetup()
@@ -49,12 +53,10 @@ classdef RSAIOTestSetup < DefaultTestSetup
             self.pulsegroup.ctrl = 'notrig';
             
             plsdefgrp(self.pulsegroup);
+            
+            % TODO: calculate expected measurement signal
         end
-        
-        function evaluate(self, measured)
-            pls = plstowf(self.pulsegroup.pulses);
-            plot(pls.data.wf);
-        end 
+
         
     end
     
