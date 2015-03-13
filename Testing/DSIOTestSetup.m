@@ -7,6 +7,10 @@ classdef DSIOTestSetup < DefaultTestSetup
         test_iterations = 100;
     end
     
+    properties(SetAccess = protected, GetAccess = public)
+        errorThreshold = 1e-4; % RMS error threshold in Volt
+    end
+    
     methods (Access = public)
         
         function obj = DSIOTestSetup()
@@ -50,13 +54,16 @@ classdef DSIOTestSetup < DefaultTestSetup
             plsdefgrp(self.pulsegroup);
         end
         
-        function evaluate(self, measured)
+        function calcExpectedData(self)
+            %TODO: get masks from somewhere, combine with waveform to
+            %calculate the expected data, related to DAC setup
             waveform = [];
             for i = 1:self.test_iterations
                 pls = plstowf(self.pulsegroup.pulses(i));
                 waveform = [waveform pls.data.wf];
             end
             plot(waveform);
+            self.expectedData = waveform;
         end
         
     end

@@ -14,6 +14,6 @@ function hardwarePulseTest()
 
     testSetup = RawIOTestSetup();
 
-    testSetup.initiate();
+    testSetup.init();
     testSetup.run();
 end
