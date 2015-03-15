@@ -19,7 +19,18 @@ classdef RSAIOTestSetup < DefaultTestSetup
     methods (Access = protected)
         
        function initDAC(self)
-            error('TODO: Must configure DAC accordingly.');
+            mask = struct('begin', self.test_start, 'end', self.test_end, 'period', self.test_period, 'hwChannel', self.inputChannel);
+            
+            self.dac = ATS9440(1);
+    
+            self.dac.samprate = 100e6; %samples per second
+            samplesInPeriod = self.test_period * self.dac.samprate / 1e6;
+            
+            self.dac.masks = { mask };
+
+            self.dac.useAsTriggerSource();
+            
+            self.dac.configureMeasurement(samplesInPeriod, self.test_iterations, 1, 8 + inputChannel);
         end
         
         function initPulseGroup(self)
@@ -27,7 +38,7 @@ classdef RSAIOTestSetup < DefaultTestSetup
             
             rng(42);
 
-            randomValues = rand(1, self.test_random_points) * 2 - 1;
+            randomValues = rand(1, self.test_random_points) * 2 - 1;            
 
             pulse.data.pulsetab = zeros(2, 4 + self.test_random_points);
             
@@ -36,7 +47,7 @@ classdef RSAIOTestSetup < DefaultTestSetup
                 self.test_end + dt, self.test_period];            
             
             pulse.data.pulsetab(2,:) = [-randomValues(1), -randomValues(1), ...
-                randomValues(1:end), ...
+                randomValues, ...
                 -randomValues(end), -randomValues(end)];
 
             pulse.name = 'RSAIOTestPulse';
@@ -49,6 +60,14 @@ classdef RSAIOTestSetup < DefaultTestSetup
             
             plsdefgrp(self.pulsegroup);
             
+            mainPulse.data.pulsetab = zeros(2, self.test_random_points);
+            mainPulse.data.pulsetab(1, :) = linspace(0, self.test_end - self.test_start, self.test_random_points);
+            mainPulse.data.pulsetab(2, :) = randomValues;
+            
+            mainPulse = plstowf(mainPulse);
+            self.expectedData = mainPulse.data.wf;
+            
+            %elementalPulse.data.wf
             % TODO: calculate expected measurement signal
         end
 

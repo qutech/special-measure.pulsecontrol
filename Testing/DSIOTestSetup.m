@@ -18,7 +18,18 @@ classdef DSIOTestSetup < DefaultTestSetup
     methods (Access = protected)
         
         function initDAC(self)
-            error('TODO: Must configure DAC accordingly.');
+            mask = struct('begin', self.test_start, 'end', self.test_end, 'period', self.test_period, 'hwChannel', self.inputChannel);
+            
+            self.dac = ATS9440(1);
+    
+            self.dac.samprate = 100e6; %samples per second
+            samplesInPeriod = self.test_period * self.dac.samprate / 1e6;
+            
+            self.dac.masks = { mask };
+
+            self.dac.useAsTriggerSource();
+            
+            self.dac.configureMeasurement(samplesInPeriod, self.test_iterations, 1, 4 + inputChannel);
         end
         
         function initPulseGroup(self)
@@ -27,6 +38,7 @@ classdef DSIOTestSetup < DefaultTestSetup
             rng(42);
 
             randomValues = rand(1, self.test_iterations) * 2 - 1;
+            self.expectedData = randomValues;
             
             self.pulsegroup.pulses = zeros(1,self.test_iterations);
             self.pulsegroup.chan = 1;
@@ -47,18 +59,6 @@ classdef DSIOTestSetup < DefaultTestSetup
             end            
 
             plsdefgrp(self.pulsegroup);
-        end
-        
-        function calcExpectedData(self)
-            %TODO: get masks from somewhere, combine with waveform to
-            %calculate the expected data, related to DAC setup
-            waveform = [];
-            for i = 1:self.test_iterations
-                pls = plstowf(self.pulsegroup.pulses(i));
-                waveform = [waveform pls.data.wf];
-            end
-            plot(waveform);
-            self.expectedData = waveform;
         end
         
     end
