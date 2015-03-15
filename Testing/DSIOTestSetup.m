@@ -1,21 +1,16 @@
 classdef DSIOTestSetup < DefaultTestSetup
     
-    properties (GetAccess = public, SetAccess = public)
+    properties (Constant, GetAccess = private)
         test_start = 400;
         test_end = 600;
         test_period = 1000;
         test_iterations = 100;
     end
     
-    properties(SetAccess = protected, GetAccess = public)
-        errorThreshold = 1e-4; % RMS error threshold in Volt
-    end
-    
     methods (Access = public)
         
         function obj = DSIOTestSetup()
-            obj = obj@DefaultTestSetup();
-            obj.duration = obj.test_iterations * obj.test_period;
+            obj = obj@DefaultTestSetup(DSIOTestSetup.test_iterations * DSIOTestSetup.test_period, 1, 1e-4);
         end
         
     end

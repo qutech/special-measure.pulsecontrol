@@ -1,6 +1,6 @@
 classdef RSAIOTestSetup < DefaultTestSetup
     
-    properties (GetAccess = public, SetAccess = public)
+    properties (Constant, GetAccess = private)
         test_start = 400;
         test_end = 600;
         test_period = 1000;
@@ -8,15 +8,10 @@ classdef RSAIOTestSetup < DefaultTestSetup
         test_random_points = 20; % must be < test_end - test_start
     end
     
-    properties(SetAccess = protected, GetAccess = public)
-        errorThreshold = 1e-4; % RMS error threshold in Volt
-    end
-    
     methods (Access = public)
         
         function obj = RSAIOTestSetup()
-            obj = obj@DefaultTestSetup();
-            obj.duration = obj.test_iterations * obj.test_period;
+            obj = obj@DefaultTestSetup(RSAIOTestSetup.test_iterations * RSAIOTestSetup.test_period, 1, 1e-4);
         end
         
     end

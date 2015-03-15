@@ -1,7 +1,12 @@
 classdef RawIOTestSetup < DefaultTestSetup
     
-    properties(SetAccess = protected, GetAccess = public)
-        errorThreshold = 1e-3; % RMS error threshold in Volt
+    methods(Access = public)
+        
+        function obj = RawIOTestSetup()
+            obj = obj@DefaultTestSetup(1000000, 1, 1e-3);
+        end
+        
     end
+    
 end
 

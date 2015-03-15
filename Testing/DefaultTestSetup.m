@@ -4,19 +4,13 @@ classdef DefaultTestSetup < TestSetup
         pulsegroup;
         dac;
         vawg;
-    end
-    
-    properties(SetAccess = protected, GetAccess = public)
-        errorThreshold = 1e-3; % RMS error threshold in Volt
+        expectedData;
     end
     
     methods (Access = public)
         
-        function obj = DefaultTestSetup()
-            obj = obj@TestSetup();
-            
-            obj.duration = 1000000; %us
-            obj.inputChannel = 1;
+        function obj = DefaultTestSetup(duration, inputChannel, errorThreshold)
+            obj = obj@TestSetup(duration, inputChannel, errorThreshold);
         end
         
         function init(self)
@@ -92,6 +86,12 @@ classdef DefaultTestSetup < TestSetup
             
             p = plstowf(pulse);
             self.expectedData = p.data.wf;
+        end
+        
+        function success = evaluate(self, measured)
+           err = measured - self.expectedData; % error signal
+           rms = std(err,0); % average error per sample
+           success = rms < self.errorThreshold; 
         end
         
     end
