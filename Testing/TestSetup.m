@@ -27,7 +27,7 @@ classdef TestSetup
         
         initPulseGroup(self); % initializes pulses and calculates expected data
         
-        success = evaluate(self, measured);
+        success = evaluate(self);
         
     end
         

@@ -4,7 +4,11 @@ classdef DefaultTestSetup < TestSetup
         pulsegroup;
         dac;
         vawg;
-        expectedData;
+    end
+    
+    properties(GetAccess = public, SetAccess = protected)
+        expectedData = [];
+        measuredData = [];
     end
     
     methods (Access = public)
@@ -37,13 +41,13 @@ classdef DefaultTestSetup < TestSetup
                 fprintf('Waiting for playback to finish...\n');
             end
 
-            measuredData = self.dac.getResult(self.inputChannel);
-            success = self.evaluate(measuredData);
+            self.measuredData = self.dac.getResult(self.inputChannel);
+            success = self.evaluate();
         end
         
     end
     
-    methods (Access = protected)    
+    methods (Access = protected)
         
         function initVAWG(self)
             self.vawg = VAWG();
@@ -88,8 +92,8 @@ classdef DefaultTestSetup < TestSetup
             self.expectedData = p.data.wf;
         end
         
-        function success = evaluate(self, measured)
-           err = measured - self.expectedData; % error signal
+        function success = evaluate(self)
+           err = self.measuredData - self.expectedData; % error signal
            rms = std(err,0); % average error per sample
            success = rms < self.errorThreshold; 
         end
