@@ -3,14 +3,16 @@ classdef TestSetup
     properties(SetAccess = private, GetAccess = protected)
         duration;
         inputChannel;
-        errorThreshold; % tolerated RMS error threshold in Volts; value strongly depends on the test
+        meanErrorThreshold; % tolerated RMS error threshold in Volts; value strongly depends on the test
+        singleErrorThreshold; % tolerated single maximum error
     end
     
     methods(Access = protected)
-        function obj = TestSetup(duration, inputChannel, errorThreshold)
+        function obj = TestSetup(duration, inputChannel, meanErrorThreshold, singleErrorThreshold)
             obj.duration = duration;
             obj.inputChannel = inputChannel;
-            obj.errorThreshold = errorThreshold;
+            obj.meanErrorThreshold = meanErrorThreshold;
+            obj.singleErrorThreshold = singleErrorThreshold;
         end
     end
     

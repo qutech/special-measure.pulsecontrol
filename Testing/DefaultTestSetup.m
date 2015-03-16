@@ -13,8 +13,8 @@ classdef DefaultTestSetup < TestSetup
     
     methods (Access = public)
         
-        function obj = DefaultTestSetup(duration, inputChannel, errorThreshold)
-            obj = obj@TestSetup(duration, inputChannel, errorThreshold);
+        function obj = DefaultTestSetup(duration, inputChannel, meanErrorThreshold, singleErrorThreshold)
+            obj = obj@TestSetup(duration, inputChannel, meanErrorThreshold, singleErrorThreshold);
         end
         
         function init(self)
@@ -95,7 +95,8 @@ classdef DefaultTestSetup < TestSetup
         function success = evaluate(self)
            err = self.measuredData - self.expectedData; % error signal
            rms = std(err,0); % average error per sample
-           success = rms < self.errorThreshold; 
+           maxerr = max(abs(err)); % maximum single error
+           success = (rms < self.meanErrorThreshold) && (maxerr < self.singleErrorThreshold); 
         end
         
     end

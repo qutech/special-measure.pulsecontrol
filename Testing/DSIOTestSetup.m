@@ -10,7 +10,7 @@ classdef DSIOTestSetup < DefaultTestSetup
     methods (Access = public)
         
         function obj = DSIOTestSetup()
-            obj = obj@DefaultTestSetup(DSIOTestSetup.test_iterations * DSIOTestSetup.test_period, 1, 1e-4);
+            obj = obj@DefaultTestSetup(DSIOTestSetup.test_iterations * DSIOTestSetup.test_period, 1, 1e-4, 1e-3);
         end
         
     end
