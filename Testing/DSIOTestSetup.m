@@ -10,7 +10,7 @@ classdef DSIOTestSetup < DefaultTestSetup
     methods (Access = public)
         
         function obj = DSIOTestSetup()
-            obj = obj@DefaultTestSetup(DSIOTestSetup.test_iterations * DSIOTestSetup.test_period, 1, 1e-4);
+            obj = obj@DefaultTestSetup(DSIOTestSetup.test_iterations * DSIOTestSetup.test_period, 1, 1e-4, 1e-3);
         end
         
     end
@@ -48,12 +48,8 @@ classdef DSIOTestSetup < DefaultTestSetup
             for i = 1:self.test_iterations
                 randomValue = randomValues(i);
                 pulse.data.pulsetab = zeros(2, 6);
-                pulse.data.pulsetab(1,:) = [0, self.test_start - dt, ...
-                    self.test_start, self.test_end, self.test_end + dt, ...
-                    self.test_period];
-                pulse.data.pulsetab(2,:) = [-randomValue, -randomValue, ...
-                    randomValue, randomValue, -randomValue, ...
-                    -randomValue];
+                pulse.data.pulsetab(1,:) = [0,            self.test_start - dt,    self.test_start, self.test_end, self.test_end + dt, self.test_period];
+                pulse.data.pulsetab(2,:) = [-randomValue, -randomValue,            randomValue,     randomValue,   -randomValue,       -randomValue];
                 pulse.name = sprintf('DSIOTestPulse%i', i);
                 self.pulsegroup.pulses(i) = plsreg(pulse);
             end            
