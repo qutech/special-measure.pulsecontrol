@@ -134,7 +134,7 @@ classdef PXDAC < AWG
                 warning('Channel mask changed. All stored pulsegroups will be removed.');
                 self.clearBoardMemory();
                 self.activeChannelMask = mask;
-                self.library('SetActiveChannelMaskXD48',self.handle,mask);
+                self.library('SetActiveChannelMaskXD48',self.handle,int32(mask));
             end
         end
         
@@ -219,9 +219,9 @@ classdef PXDAC < AWG
                 end
             end
             
-            self.library('SetPlaybackClockSourceXD48',self.handle,0);
-            self.library('SetClockDivider1XD48',self.handle,12);
-            self.library('SetClockDivider2XD48',self.handle,1);
+%             self.library('SetPlaybackClockSourceXD48',self.handle,0);
+%             self.library('SetClockDivider1XD48',self.handle,12);
+%             self.library('SetClockDivider2XD48',self.handle,1);
             
             
             self.library('SetExternalTriggerEnableXD48',...
@@ -231,12 +231,18 @@ classdef PXDAC < AWG
                 self.handle,...
                 int32(2));% XD48TRIGMODE_SINGLE_SHOT (2) Trigger runs memory data once; subsequent triggers ignored
             
+            activePG = self.storedPulsegroups(self.activePulsegroup);
+            
+            fprintf('Start playback at %i, length %i, total %i\n',...
+                uint32(activePG.start),...
+                uint32(activePG.totalByteSize),...
+                uint32(activePG.totalByteSize*activePG.repetitions));
             
             self.library('BeginRamPlaybackXD48',...
                 self.handle,...
-                uint32(self.acitveSequence.start),...
-                uint32(self.acitveSequence.length),...
-                uint32(self.acitveSequence.length*self.acitveSequence.repetitions));
+                uint32(activePG.start),...
+                uint32(activePG.totalByteSize),...
+                uint32(activePG.totalByteSize*activePG.repetitions));
         end
         
         function setOutputVoltage(self,channel,ppVoltage)
@@ -269,7 +275,7 @@ classdef PXDAC < AWG
         function playbackInProgress = isPlaybackInProgress(self)
             libReturn = calllib('PXDAC4800_64','IsPlaybackInProgressXD48', self.handle);
             if (libReturn < 0)
-                error(statusToErrorMessage(libReturn));
+                error(PXDAC.statusToErrorMessage(libReturn));
             end
             playbackInProgress = (libReturn > 0);
         end
@@ -278,14 +284,14 @@ classdef PXDAC < AWG
     methods (Static)
         function errormsg = statusToErrorMessage(status)
             errormsg = calllib('PXDAC4800_64','GetErrorMessXD48',...
-                status,...
+                int32(status),...
                 libpointer('stringPtr'),0,libpointer('voidPtr',[]));
             error(errormsg);
         end
         
         function testStatus(status)
             if status < 0
-                error(statusToErrorMessage);
+                error(PXDAC.statusToErrorMessage(status));
             end
         end
         

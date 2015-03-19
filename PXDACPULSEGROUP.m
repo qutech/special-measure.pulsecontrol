@@ -17,6 +17,8 @@ classdef PXDACPULSEGROUP < AWGPULSEGROUP
     methods
         function obj = PXDACPULSEGROUP(name)
             obj = obj@AWGPULSEGROUP(name);
+            obj.lastActivation = -Inf;
+            obj.start = [];
         end
     end
 end

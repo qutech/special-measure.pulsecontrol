@@ -1,12 +1,15 @@
 function hardwarePulseTest()
-    time = 1000000; %us
+    time = 2^14; %us
 
     % pulse to test
     testPulseGroup = initPulseGroup(time);
 
-
+        % DAQ card
+    inputChannel = 1;
+     testDAC = initDAC(time,inputChannel);
 
     global vawg;
+    vawg = [];
     % awg to test
     vawg = initVAWG();
 
@@ -15,22 +18,23 @@ function hardwarePulseTest()
     vawg.setActivePulseGroup(testPulseGroup.name);
 
     vawg.arm();
-    
-        % DAQ card
-    inputChannel = 1;
-    testDAC = initDAC(time,inputChannel);
-    
+
+
+
     % issues trigger
-    testDAC.startMeasurement();
-    
-    while vawg.playbackInProgress()
+     testDAC.startMeasurement(1);
+    %calllib('PXDAC4800_64','IssueSoftwareTriggerXD48',vawg.awgs(1).handle);
+    fprintf('START\n');
+    while vawg.isPlaybackInProgress()
         pause(1);
         fprintf('Waiting for playback to finish...\n');
     end
     
-    measuredData = testDAC.getResult(inputChannel);
+     measuredData = testDAC.getResult(inputChannel);
     
-    compareData(testPulseGroup.pulses,measuredData);
+      plot(measuredData);
+    
+%     compareData(testPulseGroup.pulses,measuredData);
 
 end
 
@@ -43,7 +47,16 @@ function dacobject  = initDAC(time,inputChannel)
     
     dacobject.useAsTriggerSource();
     
-    dacobject.configureMeasurement(1,sis,1,inputChannel);
+    mask.begin = uint32(0);
+    mask.end = uint32(2^10);
+    mask.period = uint32(2^10);
+    mask.hwChannel = uint32(1);
+    mask.type = 'Periodic Mask';
+    
+    dacobject.masks{1} = mask;
+    
+    
+    dacobject.configureMeasurement(2^10,sis/2^10,inputChannel);
 end
 
 function vawg = initVAWG()
@@ -52,12 +65,18 @@ function vawg = initVAWG()
     awg = PXDAC_DC('messrechnerDC',1);
     awg.setOutputVoltage(1,1);
     
+    calllib('PXDAC4800_64','SetClockDivider1XD48',awg.handle,12);
+    calllib('PXDAC4800_64','SetClockDivider2XD48',awg.handle,1);
+    
     vawg.addAWG(awg);
     vawg.createVirtualChannel(awg,1,1);
+%     vawg.createVirtualChannel(awg,2,2);
+%     vawg.createVirtualChannel(awg,3,3);
+%     vawg.createVirtualChannel(awg,4,3);
 end
 
 function pulsegroup = initPulseGroup(time)
-    N = 10;
+    N = 2;
     rng(42);
     
     global plsdata;
@@ -74,7 +93,8 @@ function pulsegroup = initPulseGroup(time)
     
     pulse.data.pulsetab = zeros(2,N);
     pulse.data.pulsetab(1,:) = linspace(1,time,N);
-    pulse.data.pulsetab(2,:) = rand(1,N)*2 - 1;
+    %pulse.data.pulsetab(2,:) = rand(1,N)*2 - 1;
+    pulse.data.pulsetab(2,:) = [1 -1];
     
     pulse.name = 'hardwareTestPulse';
     

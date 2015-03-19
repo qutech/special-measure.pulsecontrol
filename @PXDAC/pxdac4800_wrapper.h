@@ -44,6 +44,7 @@ int IsDcXD48 (HXD48 hBrd);
 int SetTriggerModeXD48(HXD48 hBrd, int val);
 int SetExternalTriggerEnableXD48(HXD48 hBrd, int bEnable);
 
+int IssueSoftwareTriggerXD48(HXD48 hBrd);
 
 // helper functions
 int CalculateCycleCountsXD48(
@@ -97,5 +98,29 @@ int GetOutputVoltageRangeVoltsXD48(int     val,
 	double* pPeakToPeakVolts,
 	HXD48   hBrd);
 
+int GetFPGAStatusXD48(HXD48 hBrd, unsigned int *val);
+
+int SetPlaybackClockSourceXD48(HXD48 hBrd, int val);
+
+int BeginRamPlaybackXD48(HXD48        hBrd,
+	unsigned int ram_offset_bytes,
+	unsigned int ram_length_bytes,
+	unsigned int playback_bytes);
+
+int IsPlaybackInProgressXD48(HXD48 hBrd);
+
+// Set the PXDAC4800 clock divider #1 [1,32]
+int SetClockDivider1XD48(HXD48 hBrd, int val);
+// Get the PXDAC4800 clock divider #1
+int GetClockDivider1XD48(HXD48 hBrd, int bFromCache);
+
+// Set the PXDAC4800 clock divider #2 [1,6]
+int SetClockDivider2XD48(HXD48 hBrd, int val);
+// Get the PXDAC4800 clock divider #2
+int GetClockDivider2XD48(HXD48 hBrd, int bFromCache);
+
+int GetActiveChannelMaskXD48(HXD48 hBrd, int bFromCache);
+
+int _GetOperatingModeXD48(HXD48 hBrd, int bFromCache);
 
 #endif

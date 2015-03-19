@@ -4,7 +4,7 @@ function registerPulses(self,grp)
             
             for c = grp.chan
                 if any(self.virtualChannels == c)
-                    usedHWchanels = [usedHWchanels self.getHardwareChannel( self.getHardwareChannel(grp.chan(c))) ];
+                    usedHWchanels = [usedHWchanels self.getHardwareChannel( c ) ];
                 end
             end
             
@@ -34,8 +34,8 @@ function registerPulses(self,grp)
 
                         %convert to uint16 0-2^14-1
                         int16wf = uint16(min(...
-                            data*(2^(14-1) - 1),...
-                            2^(14)-1));
+                            data*(2^(16-1) - 1),...
+                            2^(16)-1));
 
                         pulse.writeToChannel(hardChan,int16wf);
                     
