@@ -2,8 +2,9 @@ function hardwarePulseTest()
     InitializePulseData;
 
 
-    testSetup = RawIOTestSetup();
+    pulseBuilder = RandomTestPulseBuilder();
+    configurationProvider = RawIOTestConfigurationProvider(1, pulseBuilder);
+    testSetup = IOTestDriver(configurationProvider);
 
-    testSetup.init();
     testSetup.run();
 end
