@@ -30,7 +30,6 @@ classdef IOTestDriver
                 fprintf('Waiting for playback to finish...\n');
             end
 
-            % move all dac transparently to TestConfigurationProvider?
             self.measuredData = self.dac.getResult(self.configurationProvider.getInputChannel());
             
             success = self.evaluate();

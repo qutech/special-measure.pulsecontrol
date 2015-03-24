@@ -10,7 +10,7 @@ classdef TestConfigurationProvider < handle
         pulseBuilder;
     end
     
-    properties (Abstract, Constant, GetAccess = protected)
+    properties (Abstract, GetAccess = protected)
         mask;
     end
     
@@ -21,6 +21,9 @@ classdef TestConfigurationProvider < handle
     methods (Access = public)
         
         function self = TestConfigurationProvider(inputChannel, pulseBuilder)
+            assert(isa(pulseBuilder, 'TestPulseBuilder'), 'pulseBuilder must be an instance of TestPulseBuilder!');
+            assert(isnumeric(inputChannel) && inputChannel > 0, 'inputChannel must be a positive integer value!');
+            
             self.pulseBuilder = pulseBuilder;
             self.inputChannel = inputChannel;
             self.meanErrorThreshold = self.pulseBuilder.meanErrorThreshold;
