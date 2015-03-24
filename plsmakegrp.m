@@ -2,7 +2,7 @@ function grpdef = plsmakegrp(name, ctrl, ind, opts)
 % grpdef = plsmakegrp(name, ctrl, ind, opts)
 % Covert pulses in pulsegroup to wf format.
 % name: group name.
-% ctrl: 'plot', 'plot chrg', 'check', 'upload'
+% ctrl: 'plot', 'check', 'upload'
 %       for maintenance/debugging: 'clrzero', 'local'.
 %       These may mess with the upload logging, so use with care.
 % ind: optional pulse index. The default is pulseind or all pulses.
@@ -12,7 +12,7 @@ function grpdef = plsmakegrp(name, ctrl, ind, opts)
 % (c) 2010 Hendrik Bluhm.  Please see LICENSE and COPYRIGHT information in plssetup.m.
 
 global plsdata;
-global awgdata;
+global vawg;
 
 if ~exist('ctrl','var')
     ctrl='';
@@ -69,8 +69,9 @@ for k = 1:length(name)
         grpdef.params = [];
     end
     if  isfield(grpdef, 'time')&& ~isempty(grpdef.time)  
-        fprintf('Ignoring opts.time ');
-        opts.time=grpdef.time;        
+        fprintf('Ignoring opts.time\n');
+        opts.time=grpdef.time;
+        
     end
     
     switch grpdef.ctrl(1:min([end find(grpdef.ctrl == ' ', 1)-1]))
@@ -301,8 +302,9 @@ for k = 1:length(name)
                 plsplot(grpdef.pulses,[],ctrl);
             end
             
-        case 'check'          
+        case 'check'       
             for i = 1:length(ind)
+                error('scale implementatoin for vawg is missing.');
                 over=0;
                 for a=1:length(awgdata)
                   for c=1:length(grpdef.pulses(i).data)
@@ -345,11 +347,14 @@ for k = 1:length(name)
                 
                 % Actually handle the upload...
                 if isempty(strfind(ctrl, 'local'))
-                    zerolen = awgload(packdef, ind);
-                    zerolen=zerolen{1};
+                    for awg = vawg.awgs
+                        awg.load(packdef, ind);
+                        zerolen = awg.zeroLength(packdef,ind,zerolen);
+                    end
                 else
-                    zerolen = awgzero(packdef, ind);
-                    zerolen=zerolen{1};
+                    error('local not supported in multiple awg upload yet')
+%                     zerolen = awgzero(packdef, ind);
+%                     zerolen = zerolen{1};
                 end
                 
                 if pack                    
@@ -401,7 +406,6 @@ for k = 1:length(name)
             else
                 fprintf('Skipping group %s.\n', grpdef.name);
             end
-
     end
 end
 

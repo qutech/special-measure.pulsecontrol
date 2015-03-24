@@ -13,7 +13,7 @@ function plsupdate(newdef)
 % Not implmented: Missing or nan entries of params are taken from previous values.
 
 global plsdata;
-global awgdata;
+global vawg;
 
 if length(newdef) > 1
     if iscell(newdef)
@@ -147,13 +147,11 @@ if plschng % pulses changed
     lastupdate = now;
     save(file, '-append', 'grpdef', 'lastupdate');
     logentry('Updated group %s.', grpdef.name);
-    ind = awggrpind(grpdef.name);
     
-    if ~isnan(ind)  
-        for i=1:length(awgdata)
-          awgdata(i).pulsegroups(ind).lastupdate=now;
-        end
+    for awg = vawg.awgs
+        awg.markforupdate(grpdef.name);
     end
+
 else
     fprintf('Didn''t update group "%s": nothing changed\n',grpdef.name);
 end
