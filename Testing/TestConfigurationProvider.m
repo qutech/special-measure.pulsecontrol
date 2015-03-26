@@ -33,7 +33,7 @@ classdef TestConfigurationProvider < handle
         function createPulseGroup(self)
             self.pulseBuilder.reset();
             self.computePulseGroup();
-            plsdefgrp(self.pulseBuilder.pulseGroup);
+            plsdefgrp(self.pulseBuilder.pulseGroup, true); % Second argument suppresses file overwrite user query
         end
         
         function pulseGroup = getPulseGroup(self)
