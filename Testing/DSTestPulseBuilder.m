@@ -1,4 +1,12 @@
 classdef DSTestPulseBuilder < TestPulseBuilder
+    % DSTestPulseBuilder Provides a pulse group for tests of the
+    % downsampling operation.
+    %
+    % Each call to addPulse constructs a new pulse that holds a voltage
+    % level between mask.begin and mask.end and holds the negative value of
+    % this voltage for the rest of the pulse. The expected data for each
+    % pulse is that voltage level. Each call to addPulse adds a value to
+    % the expected data.
     
     properties (Constant, GetAccess = public)
         meanErrorThreshold = 1e-4;

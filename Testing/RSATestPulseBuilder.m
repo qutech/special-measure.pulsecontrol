@@ -1,4 +1,15 @@
 classdef RSATestPulseBuilder < TestPulseBuilder
+    % RSATestPulseBuilder Provides a pulse group for tests of the
+    % repetitive signal averaging operation.
+    %
+    % Each call to addPulse constructs a new pulse that has a random
+    % pattern of voltage levels between mask.begin and mask.end and holds
+    % the negative of the first and the last of these values repectively
+    % before and after this time window. This random pattern is the same
+    % for all constructed pulses although the time window may vary (it must
+    % be of the same length for all calls).
+    % The expected data is this voltage pattern which is constructed in
+    % the first call to addPulse and not altered in subsequent calls.
     
     properties (Constant, GetAccess = public)
         meanErrorThreshold = 1e-4;

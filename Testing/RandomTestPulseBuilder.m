@@ -1,4 +1,10 @@
 classdef RandomTestPulseBuilder < TestPulseBuilder
+    % RandomTestPulseBuilder Provides a pulse group for tests of the
+    % raw hardware IO functionality.
+    %
+    % Calls to addPulse create a pulse with a random pattern of voltage
+    % values disregarding mask.begin and mask.end. The expected data is
+    % exactly this pattern of values.
     
     properties (Constant, GetAccess = public)
         meanErrorThreshold = 1e-3;
