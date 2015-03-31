@@ -1,4 +1,12 @@
 classdef TableMaskTestConfigurationProvider < TestConfigurationProvider
+    % TableMaskTestConfigurationProvider Provides a test configuration for
+    % a table mask.
+    %
+    % The default mask has a period of 1000 and 100 readout windows:
+    % [400,600], [402, 602], .... [600, 800]. The default mask can be
+    % replaced by any other table mask in the constructor (optional).
+    % The constructed test pulse group is contains the according amount of
+    % pulses in sequence.
     
     properties (GetAccess = protected)
         mask = struct( ...

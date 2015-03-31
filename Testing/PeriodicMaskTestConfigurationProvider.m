@@ -1,4 +1,13 @@
 classdef PeriodicMaskTestConfigurationProvider < TestConfigurationProvider
+    % PeriodicMaskTestConfigurationProvider Provides a test configuration for
+    % a periodic mask.
+    %
+    % The default mask has a period of 1000 and a readout window from 400
+    % to 600. It can be replaced by any other periodic mask in the
+    % constructor (optional).
+    % The test pulse group is constructed by creating a given number of
+    % pulses with the same mask. This number of iterations defaults to 100
+    % but can be changed via the class constructor (optional).
     
     properties (GetAccess = protected)
         mask = struct( ...

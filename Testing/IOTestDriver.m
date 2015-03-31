@@ -1,4 +1,12 @@
 classdef IOTestDriver
+    % IOTestDriver A driver for a single hardware IO test configured by a
+    % TestConfigurationProvider (and thus a TestPulseBuilder) instance.
+    %
+    % IOTestDriver sets up a VAWG object and initializes a DAC instance
+    % using the given TestConfigurationProvider object. It then obtains the
+    % test pulse group from the TestConfigurationProvider instance,
+    % executes the test and compares mean and single errors to the
+    % thresholds given.
     
     properties (SetAccess = private, GetAccess = private)
         vawg;

@@ -1,9 +1,16 @@
 classdef TestConfigurationProvider < handle
+    % TestConfigurationProvider An abstract base for classes that provide
+    % a readout mask for hardware IO Tests and construct a pulse group
+    % using a TestPulseBuilder instance accordingly.
+    %
+    % Subclasses need to implement the following properties/methods:
+    % - mask
+    % - computePulseGroup
     
     properties (SetAccess = private, GetAccess = public)
         inputChannel = 1;
-        meanErrorThreshold;
-        singleErrorThreshold;
+        meanErrorThreshold; % Value copied from pulseBuilder object in constructor
+        singleErrorThreshold; % Value copied from pulseBuilder object in constructor
     end
     
     properties (SetAccess = private, GetAccess = protected)
@@ -11,10 +18,13 @@ classdef TestConfigurationProvider < handle
     end
     
     properties (Abstract, GetAccess = protected)
+        % The readout mask used in the DAC (periodic or table mask).
         mask;
     end
     
     methods (Abstract, Access = protected)
+        % Constructs the pulse group. Must not use plsdefgrp(..). Called by
+        % createPulseGroup().
         computePulseGroup(self);
     end
     
@@ -30,20 +40,29 @@ classdef TestConfigurationProvider < handle
             self.singleErrorThreshold = self.pulseBuilder.singleErrorThreshold;
         end
         
+        % Create the pulse group using the provider TestPulseBuilder
+        % instance with the internally implemented pulse group construction
+        % algorithm.
         function createPulseGroup(self)
             self.pulseBuilder.reset();
             self.computePulseGroup();
             plsdefgrp(self.pulseBuilder.pulseGroup);
         end
         
+        % Obtains the created pulse group. Make sure to call
+        % createPulseGroup first.
         function pulseGroup = getPulseGroup(self)
             pulseGroup = self.pulseBuilder.pulseGroup;
         end
         
+        % Obtains the expected data. Make sure to call createPulseGroup
+        % first.
         function expectedData = getExpectedData(self)
             expectedData = self.pulseBuilder.expectedData;
         end
         
+        % Constructs and returns the DAC object for the test initialized
+        % with the specific readout mask for the test.
         function dac = createDAC(self)
             switch (self.pulseBuilder.dacOperation)
                 case 'raw'
