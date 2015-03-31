@@ -13,8 +13,6 @@
 #include "internal_header.h"
 #include "MemoryManager.hpp"
 
-const char* defaultLogPath = "C:\Users\Public\PXDACMemoryManager.log";
-static std::ofstream PXDAClog(defaultLogPath);
 static std::unique_ptr< MemoryManager<U16> > manager;
 
 EXPORT int initializeU16(HXD48 handle, unsigned int total_memory, unsigned int chunk_size)
@@ -23,9 +21,12 @@ EXPORT int initializeU16(HXD48 handle, unsigned int total_memory, unsigned int c
 	{
 		if (manager)
 		{
-			std::cout << "Deleting old memory manager." << std::endl;
-			manager.reset(nullptr);
+			logger::log("Deleting old memory manager.");
+			int status = free_memory();
+			if (status)
+				return status;
 		}
+		logger::log("Start allocation of " , total_memory , " bytes of memory in " , total_memory / chunk_size , " buffers of size " , chunk_size , ".");
 		manager.reset( new MemoryManager<U16>(handle, total_memory, chunk_size) );
 	}
 	catch (PXDAC_exception& e)
@@ -86,8 +87,7 @@ EXPORT int free_memory()
 
 EXPORT void setLogFile(const char* path)
 {
-	PXDAClog.close();
-	PXDAClog.open(path);
+	logger::setStreamToFile(std::string(path));
 }
 
 EXPORT int getMode()

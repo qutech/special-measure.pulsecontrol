@@ -23,6 +23,7 @@ classdef AWG < handle & matlab.mixin.Heterogeneous
         storedPulsegroups = AWGSTORAGE();
         activePulsegroup = 'none';
         
+        outputRange = [];
     end
     
     properties (GetAccess = public, SetAccess = ?VAWG)

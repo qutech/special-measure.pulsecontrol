@@ -7,13 +7,26 @@
 #include "C:\Program Files\Signatec\PXDAC4800\Include\pxdac4800.h"
 
 #include "internal_header.h"
+#include "logger.h"
 
 /*	This exception is thrown if any board function returns non-zero status.
 *	It should(must) be catched by the calling interface function.*/
 class PXDAC_exception
 {
+	
 public:
-	PXDAC_exception(int stat) :status(stat){}
+	PXDAC_exception(int stat) :status(stat)
+	{
+		wchar_t* buffer = nullptr;
+
+		GetErrorTextXD48(status, &buffer, 0);
+
+		std::basic_string<wchar_t> txt(buffer);
+
+		logger::log("Error ",status,": ",buffer,"\n");
+
+		FreeMemoryXD48(buffer);
+	}
 	int status;
 };
 
