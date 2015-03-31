@@ -1,4 +1,4 @@
-classdef TestPulseBuilder < handle
+classdef TestPulseBuilder < handle & matlab.mixin.Heterogeneous
     
     properties (Constant, Abstract, GetAccess = public)
         meanErrorThreshold;
@@ -12,6 +12,7 @@ classdef TestPulseBuilder < handle
     
     properties (SetAccess = private, GetAccess = public)
         pulseCount = 0;
+        voltageRange = [-0.5 0.5];
     end
     
     properties (SetAccess = protected, GetAccess = public)
@@ -25,7 +26,8 @@ classdef TestPulseBuilder < handle
     
     methods (Access = protected)
         
-        function self = TestPulseBuilder()
+        function self = TestPulseBuilder(voltageRange)
+            self.voltageRange = voltageRange;
             self.reset();
         end
         
@@ -42,6 +44,14 @@ classdef TestPulseBuilder < handle
             self.pulseGroup = self.pulseGroupPrototype;
             self.pulseCount = 0;
             self.expectedData = [];
+        end
+    end
+    
+    methods (Access = protected)
+        
+        function y = convertToVoltageRange(self, x)
+            peakToPeakVoltage = self.voltageRange(2) - self.voltageRange(1);
+            y = x .* peakToPeakVoltage + self.voltageRange(1);
         end
     end
     

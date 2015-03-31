@@ -1,7 +1,6 @@
-classdef IOTestDriver
+classdef IOTestDriver < handle & matlab.mixin.Heterogeneous
     
     properties (SetAccess = private, GetAccess = private)
-        vawg;
         configurationProvider;
         dac;
     end
@@ -30,7 +29,7 @@ classdef IOTestDriver
                 fprintf('Waiting for playback to finish...\n');
             end
 
-            self.measuredData = self.dac.getResult(self.configurationProvider.getInputChannel());
+            self.measuredData = self.dac.getResult(self.configurationProvider.inputChannel());
             
             success = self.evaluate();
         end
@@ -40,6 +39,9 @@ classdef IOTestDriver
     methods (Access = private)
         
         function init(self)
+            
+            % setup awg
+            self.initVAWG();
                         
             % obtain pulse group and expected data from test configuration
             self.configurationProvider.createPulseGroup();
@@ -50,20 +52,22 @@ classdef IOTestDriver
             self.dac = self.configurationProvider.createDAC();
             self.dac.useAsTriggerSource();
             
-            % setup and arm awg
-            self.initVAWG();
-            self.vawg.add(pulseGroup);
-            self.vawg.setActivePulseGroup(pulseGroup);
-            self.vawg.arm();
+            % arm vawg
+            global vawg;
+            vawg.add(pulseGroup);
+            vawg.setActivePulseGroup(pulseGroup);
+            vawg.arm();
         end
         
         function initVAWG(self)
-            self.vawg = VAWG();
+            global vawg;
+            
+            vawg = VAWG();
             awg = PXDAC_DC('messrechnerDC', 1);
             awg.setOutputVoltage(1, 1);
 
-            self.vawg.addAWG(awg);
-            self.vawg.createVirtualChannel(awg, 1, 1);
+            vawg.addAWG(awg);
+            vawg.createVirtualChannel(awg, 1, 1);
         end
         
         function success = evaluate(self)

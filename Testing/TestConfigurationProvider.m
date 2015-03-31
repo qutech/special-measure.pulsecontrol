@@ -1,4 +1,4 @@
-classdef TestConfigurationProvider < handle
+classdef TestConfigurationProvider < handle & matlab.mixin.Heterogeneous
     
     properties (SetAccess = private, GetAccess = public)
         inputChannel = 1;
@@ -10,7 +10,7 @@ classdef TestConfigurationProvider < handle
         pulseBuilder;
     end
     
-    properties (Abstract, GetAccess = protected)
+    properties (Abstract, SetAccess = protected, GetAccess = protected)
         mask;
     end
     
@@ -60,7 +60,7 @@ classdef TestConfigurationProvider < handle
             dac.samprate = 100e6;
             samplesInPeriod = self.mask.period * dac.samprate / 1e6;
             dac.masks = { self.mask };
-            dac.configureMeasurement(samplesInPeriod, self.pulseBuilder.pulseCount, 1, operation);
+            dac.configureMeasurement(samplesInPeriod, self.pulseBuilder.pulseCount, operation);
         end
         
     end

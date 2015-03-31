@@ -26,8 +26,8 @@ classdef RSATestPulseBuilder < TestPulseBuilder
     
     methods (Access = public)
         
-        function self = RSATestPulseBuilder()
-            self = self@TestPulseBuilder();
+        function self = RSATestPulseBuilder(voltageRange)
+            self = self@TestPulseBuilder(voltageRange);
             rng(42);
         end
         
@@ -60,8 +60,9 @@ classdef RSATestPulseBuilder < TestPulseBuilder
             assert(mask.end == mask.period || mask.end <= mask.period - dt, 'Could not compute pulse because end of readout windows was to close to period.');
             
             if (isempty(self.readoutVoltages))
+                
                 readoutVoltageCount = floor(self.readoutDuration / self.voltageHoldDuration) + 1;
-                self.readoutVoltages = rand(1, readoutVoltageCount) * 2 - 1;
+                self.readoutVoltages = self.convertToVoltageRange(rand(1, readoutVoltageCount));
                 
                 readoutPulse.data.pulsetab = [linspace(0, self.readoutDuration, readoutVoltageCount); self.readoutVoltages];
                 

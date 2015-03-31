@@ -20,8 +20,8 @@ classdef DSTestPulseBuilder < TestPulseBuilder
     
     methods (Access = public)
         
-        function self = DSTestPulseBuilder()
-            self = self@TestPulseBuilder();
+        function self = DSTestPulseBuilder(voltageRange)
+            self = self@TestPulseBuilder(voltageRange);
             rng(42);
         end
         
@@ -38,7 +38,7 @@ classdef DSTestPulseBuilder < TestPulseBuilder
             assert(mask.begin == 0 || mask.begin >= dt, 'Could not compute pulse because begin of readout window was to close to zero.');
             assert(mask.end == mask.period || mask.end <= mask.period - dt, 'Could not compute pulse because end of readout windows was to close to period.');
             
-            randomVoltage = rand(1, 1) * 2 - 1;
+            randomVoltage = self.convertToVoltageRange(rand(1, 1));
             
             readoutVoltages = [ mask.begin,     mask.end; ...
                                 randomVoltage,  randomVoltage ];
