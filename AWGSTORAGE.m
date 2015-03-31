@@ -2,10 +2,14 @@
 %access like storage.member(3).bla
 classdef AWGSTORAGE < handle
     properties
-        mData = AWGPULSEGROUP.empty();
+        mData;
     end
     
     methods
+        function obj = AWGSTORAGE()
+            obj.mData = AWGPULSEGROUP.empty();
+        end
+        
         function i = index(self,identifier)
             i = find( strcmp({self.mData.name},identifier) );
             if size(i,2) > 1

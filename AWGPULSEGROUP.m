@@ -9,6 +9,8 @@ classdef AWGPULSEGROUP < matlab.mixin.Heterogeneous & handle
     methods
         function obj = AWGPULSEGROUP(name)
             obj.name = name;
+            obj.lastload = -Inf;
+            obj.repetitions = [];
         end
     end
 end

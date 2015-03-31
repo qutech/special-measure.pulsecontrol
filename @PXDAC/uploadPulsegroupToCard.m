@@ -23,6 +23,7 @@ if ~isempty(pulsegroup.start)
     end
 end
 
+fprintf('loading %s...\n',pulsegroup.name);
 
 %check mask
 if waveformArray(1).channelMask ~= self.activeChannelMask
@@ -32,22 +33,21 @@ end
 
 totalByteSize = [waveformArray(pulsegroup.pulseSequence.index).byteSize]*[pulsegroup.pulseSequence.nrep]';
 
-
+if mod(totalByteSize,8192) ~= 0
+    error('The total length of a pulsegroup must be a multiple of 8192 but it is %d*8192',totalByteSize/8192);
+end
 
 %find free coherent space in memory
-[start,index] = self.freeEnoughMemory( totalByteSize );
+[startOfPulsegroup,index] = self.freeEnoughMemory( totalByteSize );
 
 
-if isempty(index) || isempty(start)
+if isempty(index) || isempty(startOfPulsegroup)
     error('Out of board memory. Please erase some sequences from board.');
 end
 
 %
-self.storedPulsegroups.move(name,index);
 
-self.storedPulsegroups(name).start = start;
-self.storedPulsegroups(name).totalByteSize = totalByteSize;
-
+start = startOfPulsegroup;
 for playedPulse = pulsegroup.pulseSequence
     
     pulse = waveformArray(playedPulse.index);
@@ -69,7 +69,12 @@ for playedPulse = pulsegroup.pulseSequence
         start = start + wfSize;
     end
 end
-PXDAC.testStatus( calllib('PXDACMemoryManager','synchronize',false) );
+
+self.storedPulsegroups.move(name,index);
+self.storedPulsegroups(name).start = startOfPulsegroup;
+self.storedPulsegroups(name).totalByteSize = totalByteSize;
+
+PXDAC.testStatus( calllib('PXDACMemoryManager','synchronize',0) );
 self.storedPulsegroups(name).lastMemoryUpdate = now;
 
 end

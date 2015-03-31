@@ -23,6 +23,7 @@ classdef AWG < handle & matlab.mixin.Heterogeneous
         storedPulsegroups = AWGSTORAGE();
         activePulsegroup = 'none';
         
+        outputRange = [];
     end
     
     properties (GetAccess = public, SetAccess = ?VAWG)
@@ -73,6 +74,7 @@ classdef AWG < handle & matlab.mixin.Heterogeneous
             obj.offset = zeros(1,obj.nChannels);
             obj.scale = ones(1,obj.nChannels);
             obj.resolution = obj.possibleResolutions(1);
+            obj.storedPulsegroups = AWGSTORAGE();
         end
         
         function virtChan = getVirtualChannel(self,chan)
@@ -137,7 +139,7 @@ classdef AWG < handle & matlab.mixin.Heterogeneous
                     
                     if hardChan
                     
-                        if any(abs(grp.pulses(i).data(dind).wf(virtChan,:)) > epsilon(hardChan) )
+                        if true %any(abs(grp.pulses(i).data(dind).wf(virtChan,:)) > epsilon )
                             zerolen(ind(i),virtChan) = -npts;
                         else
                             zerolen(ind(i),virtChan) = npts;

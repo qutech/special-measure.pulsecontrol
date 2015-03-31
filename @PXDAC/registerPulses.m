@@ -4,7 +4,7 @@ function registerPulses(self,grp)
             
             for c = grp.chan
                 if any(self.virtualChannels == c)
-                    usedHWchanels = [usedHWchanels self.getHardwareChannel( self.getHardwareChannel(grp.chan(c))) ];
+                    usedHWchanels = [usedHWchanels self.getHardwareChannel( c ) ];
                 end
             end
             
@@ -28,16 +28,25 @@ function registerPulses(self,grp)
                 for virtChan = 1:size(grp.pulses(i).data(dind).wf, 1)
                     
                     for hardChan = self.getHardwareChannel(grp.chan(virtChan));
+                        
+                        if self.outputRange(hardChan) == 0
+                            error('Output range of channel %i has not been set.',hardChan);
+                        end
 
-                        %map to interval [0,2]
-                        data =  ((self.offset(min(hardChan,end)) + grp.pulses(i).data(dind).wf(virtChan, :))./self.scale(hardChan) + 1);
+                        maximum = (self.outputRange(hardChan) - self.offset(hardChan)) / self.scale(hardChan);
+                        minimum = (-self.outputRange(hardChan) - self.offset(hardChan)) / self.scale(hardChan);
+                        
+                        if any( grp.pulses(i).data(dind).wf(virtChan, :) > maximum ) || any( grp.pulses(i).data(dind).wf(virtChan, :) < minimum )
+                            error('Some values in pulse %i in virtual channel %i are to large for the output range.',i,virtChan);
+                        end
+                        
+                        uint16wf =  uint16(...
+                            ((grp.pulses(i).data(dind).wf(virtChan, :) * self.scale(hardChan) + self.offset(hardChan))...convert to volts
+                            /self.outputRange(hardChan) + 1) ... map to interval [0,2]
+                            *(2^(16-1) - 1)); %map to interval [0,2^16-1]
+                        
 
-                        %convert to uint16 0-2^14-1
-                        int16wf = uint16(min(...
-                            data*(2^(14-1) - 1),...
-                            2^(14)-1));
-
-                        pulse.writeToChannel(hardChan,int16wf);
+                        pulse.writeToChannel(hardChan,uint16wf);
                     
                     end
                     

@@ -43,9 +43,7 @@ classdef PXDAC < AWG
             end
             
             %load library
-            if ~libisloaded('PXDAC4800_64')
-                loadlibrary('PXDAC4800_64.dll', 'pxdac4800_wrapper.h');
-            end
+            PXDAC.assertLibraryIsLoaded();
             
             
             %check if device is present
@@ -65,7 +63,7 @@ classdef PXDAC < AWG
             
             
             temp = libpointer('uint32Ptr', uint32(0));
-            obj.library('GetSerialNumberXD48',obj.handle,temp);
+            PXDAC.library('GetSerialNumberXD48',obj.handle,temp);
             obj.serialNumber = get(temp);
             obj.serialNumber = obj.serialNumber.Value;
             clear('temp');
@@ -77,37 +75,17 @@ classdef PXDAC < AWG
             
             obj.clk = 100e6;
             
-            obj.library('SetTriggerModeXD48',obj.handle,2);%single shot trigger mode
+            PXDAC.library('SetTriggerModeXD48',obj.handle,2);%single shot trigger mode
             
-            if ~libisloaded('PXDACMemoryManager')
-                loadlibrary('C:\Users\humpohl\Documents\Visual Studio 2013\Projects\PXDACMemoryManager\x64\Debug\PXDACMemoryManager.dll','C:\Users\humpohl\Documents\Visual Studio 2013\Projects\PXDACMemoryManager\PXDAC_memory_manager.h')
-            end
-            
-            %initialize memory manager
-            chunkexponent = 22; %2^22 * sizeof(U16) ~ 8 MB
-            maxsamples = 2^29; % 1 GB
-            
-            %make chunk size smaller as long as allocation fails
-            %bigger chunks are much faster to upload but are not as easy to
-            %create for the operating system
-            status = -1;
-            while status~=0
-                chunksamples = 2^chunkexponent;
-                
-                status = calllib('PXDACMemoryManager','initializeU16',obj.handle,uint32(maxsamples),uint32(chunksamples));
-                chunkexponent = chunkexponent-1;
-                
-                if chunkexponent == 0
-                    error('can not allocate enouch DMA buffers for PXDAC.');
-                end
-            end
-            fprintf('Initialized memory manager with 2^%d samples per chunk.\n', chunkexponent);
-            
+
+            obj.initializeMemoryManager(obj.totalMemory/2)
             
             fprintf('%s: successfully connected to %s (your mother) with serial number %d\n',id,class(obj),obj.serialNumber);
         end
          
         registerPulses(self,grp);
+        
+        initializeMemoryManager(self,sizeInSamples);
         
     end
     
@@ -134,7 +112,7 @@ classdef PXDAC < AWG
                 warning('Channel mask changed. All stored pulsegroups will be removed.');
                 self.clearBoardMemory();
                 self.activeChannelMask = mask;
-                self.library('SetActiveChannelMaskXD48',self.handle,mask);
+                self.library('SetActiveChannelMaskXD48',self.handle,int32(mask));
             end
         end
         
@@ -219,9 +197,9 @@ classdef PXDAC < AWG
                 end
             end
             
-            self.library('SetPlaybackClockSourceXD48',self.handle,0);
-            self.library('SetClockDivider1XD48',self.handle,12);
-            self.library('SetClockDivider2XD48',self.handle,1);
+%             self.library('SetPlaybackClockSourceXD48',self.handle,0);
+%             self.library('SetClockDivider1XD48',self.handle,12);
+%             self.library('SetClockDivider2XD48',self.handle,1);
             
             
             self.library('SetExternalTriggerEnableXD48',...
@@ -231,12 +209,18 @@ classdef PXDAC < AWG
                 self.handle,...
                 int32(2));% XD48TRIGMODE_SINGLE_SHOT (2) Trigger runs memory data once; subsequent triggers ignored
             
+            activePG = self.storedPulsegroups(self.activePulsegroup);
+            
+            fprintf('Start playback at %i, length %i, total %i\n',...
+                uint32(activePG.start),...
+                uint32(activePG.totalByteSize),...
+                uint32(activePG.totalByteSize*activePG.repetitions));
             
             self.library('BeginRamPlaybackXD48',...
                 self.handle,...
-                uint32(self.acitveSequence.start),...
-                uint32(self.acitveSequence.length),...
-                uint32(self.acitveSequence.length*self.acitveSequence.repetitions));
+                uint32(activePG.start),...
+                uint32(activePG.totalByteSize),...
+                uint32(activePG.totalByteSize*activePG.repetitions));
         end
         
         function setOutputVoltage(self,channel,ppVoltage)
@@ -247,6 +231,7 @@ classdef PXDAC < AWG
                 error('Voltage %d to small',ppVoltage);
             end
             
+            self.outputRange(channel) = ppVoltage/2;
             
             self.library(sprintf('SetOutputVoltageCh%iXD48',channel),...
                 self.handle,...
@@ -269,27 +254,35 @@ classdef PXDAC < AWG
         function playbackInProgress = isPlaybackInProgress(self)
             libReturn = calllib('PXDAC4800_64','IsPlaybackInProgressXD48', self.handle);
             if (libReturn < 0)
-                error(statusToErrorMessage(libReturn));
+                error(PXDAC.statusToErrorMessage(libReturn));
             end
             playbackInProgress = (libReturn > 0);
         end
     end
     
     methods (Static)
+        function assertLibraryIsLoaded()
+            if ~libisloaded('PXDAC4800_64')
+                loadlibrary('PXDAC4800_64.dll', 'pxdac4800_wrapper.h');
+            end
+        end
+        
         function errormsg = statusToErrorMessage(status)
+            PXDAC.assertLibraryIsLoaded();
             errormsg = calllib('PXDAC4800_64','GetErrorMessXD48',...
-                status,...
+                int32(status),...
                 libpointer('stringPtr'),0,libpointer('voidPtr',[]));
             error(errormsg);
         end
         
         function testStatus(status)
             if status < 0
-                error(statusToErrorMessage);
+                error(PXDAC.statusToErrorMessage(status));
             end
         end
         
         function library(fn, varargin)
+            PXDAC.assertLibraryIsLoaded();
             PXDAC.testStatus( calllib('PXDAC4800_64', fn, varargin{:}) );
         end
     end
