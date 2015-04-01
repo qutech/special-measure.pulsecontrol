@@ -33,6 +33,7 @@ classdef RawIOTestConfigurationProvider < TestConfigurationProvider
                 assert(isnumeric(iterations) && iterations > 0, 'iterations must be a positive integer value!');
                 self.iterations = iterations;
             end
+            self.mask.hwChannel = inputChannel;
         end
     end
     

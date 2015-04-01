@@ -36,7 +36,7 @@ classdef TestPulseBuilder < handle & matlab.mixin.Heterogeneous
     methods (Access = public)
         
         function addPulse(self, mask, repetitions)
-            self.pulseCount = self.pulseCount + repetitions * mask.period;
+            self.pulseCount = self.pulseCount + repetitions;
             self.createPulse(mask, repetitions);
         end
         

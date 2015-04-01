@@ -22,14 +22,15 @@ classdef IOTestDriver < handle & matlab.mixin.Heterogeneous
         function success = run(self)
             self.init();
             
-            self.dac.issueTrigger();
+            self.dac.startMeasurement(1); % TODO: what's the meaning of the parameter? input channel?
             
-            while self.vawg.playbackInProgress()
+            while self.vawg.isPlaybackInProgress()
                 pause(1);
                 fprintf('Waiting for playback to finish...\n');
             end
 
-            self.measuredData = self.dac.getResult(self.configurationProvider.inputChannel());
+            measuredResult = self.dac.getResult(self.configurationProvider.inputChannel);
+            self.measuredData = measuredResult'; % TODO: why is dac.getResult transposed to expectedData?
             
             success = self.evaluate();
         end
@@ -54,17 +55,23 @@ classdef IOTestDriver < handle & matlab.mixin.Heterogeneous
             
             % arm vawg
             global vawg;
-            vawg.add(pulseGroup);
-            vawg.setActivePulseGroup(pulseGroup);
+            vawg.add(pulseGroup.name);
+            vawg.setActivePulseGroup(pulseGroup.name);
             vawg.arm();
         end
         
+        % TODO: move this out of the class as soon as the unit test driver
+        % change is merged into the official repository
         function initVAWG(self)
             global vawg;
             
             vawg = VAWG();
             awg = PXDAC_DC('messrechnerDC', 1);
-            awg.setOutputVoltage(1, 1);
+            awg.setOutputVoltage(1, 1.4);
+            
+            % TODO: this should be encapsulated in PXDAC..
+            calllib('PXDAC4800_64', 'SetClockDivider1XD48', awg.handle, 12);
+            calllib('PXDAC4800_64', 'SetClockDivider2XD48', awg.handle, 1);
 
             vawg.addAWG(awg);
             vawg.createVirtualChannel(awg, 1, 1);

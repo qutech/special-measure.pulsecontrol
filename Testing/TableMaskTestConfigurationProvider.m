@@ -1,6 +1,7 @@
 classdef TableMaskTestConfigurationProvider < TestConfigurationProvider
     
     properties (SetAccess = protected, GetAccess = protected)
+        % TODO: does period always need to be a potency of 2?
         mask = struct( ...
             'type',     'Table Mask', ...
             'begin',    400 + floor(linspace(0, 200, 100)), ...
@@ -32,6 +33,7 @@ classdef TableMaskTestConfigurationProvider < TestConfigurationProvider
                 assert(numel(mask.begin) == numel(mask.end), 'begin and end table dimensions of mask are not equal!');
                 self.mask = mask;
             end
+            self.mask.hwChannel = inputChannel;
         end
         
     end
